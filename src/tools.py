@@ -51,7 +51,21 @@ def sharpe(r: pd.Series, rf_rate=0.0, freq=252):
 
 
 def calmar_ratio(r: pd.Series, freq=252):
-    x = (1+r).cumprod()
+    x = (1 + r).cumprod()
     mdd = max(1 - x / x.cummax())
     mu = r.mean()
     return mu / mdd * freq
+
+
+def to_rebalance(B: np.ndarray, X: pd.DataFrame):
+    """
+    :param X: price relatives
+    :param B: weight
+    """
+    E = (B * (X - 1)).sum(axis=1) + 1
+
+    X = X.copy()
+
+    hold_B = (B * X).div(E, axis=0)
+
+    return B - hold_B.shift(1)

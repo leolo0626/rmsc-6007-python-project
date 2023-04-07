@@ -14,6 +14,7 @@ weight10 = pd.read_csv('result_nasdaq10_corn.csv', index_col=0)[1:]
 weight10.index = nasdaq10_price_relative.index
 
 algo_result = AlgoResult(nasdaq10_price_relative, weight10)
+algo_result.fee = 0.02/100
 
 # Equity Curve
 algo_result.equity_curve.plot(kind='line', rot=45)

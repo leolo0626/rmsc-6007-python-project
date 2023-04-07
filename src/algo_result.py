@@ -1,18 +1,39 @@
 import pandas as pd
 import numpy as np
-from src.tools import sharpe, calmar_ratio
+from src.tools import sharpe, calmar_ratio, to_rebalance
 
 
 class AlgoResult:
     def __init__(self, X: pd.DataFrame, B: np.ndarray):
         self.X = X
         self.B = B
+        self._fee = 0.0
         self._recalculate()
 
     def _recalculate(self):
         r = (self.X - 1) * self.B
+
+        self.fees = self._to_rebalance().abs() * self.fee
+
         self.asset_r = r + 1
+        self.asset_r -= self.fees
+
         self.r = r.sum(axis=1) + 1
+        self.r -= self.fees.sum(axis=1)
+        self.r = np.maximum(self.r, 1e-10)
+
+    def _to_rebalance(self):
+        return to_rebalance(self.B, self.X)
+
+    @property
+    def fee(self):
+        return self._fee
+
+    @fee.setter
+    def fee(self, value: float):
+        self._fee = value
+        self._recalculate()
+
 
     @property
     def weights(self):
@@ -66,5 +87,6 @@ class AlgoResult:
             'annualized_volatility': self.annualized_volatility,
             'sharpe_ratio': self.sharpe_ratio,
             'mdd': self.max_drawdown,
-            'calmar_ratio': self.calmar_ratio
+            'calmar_ratio': self.calmar_ratio,
+            'final_wealth': self.total_wealth
         }
