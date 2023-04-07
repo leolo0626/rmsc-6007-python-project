@@ -49,3 +49,9 @@ def sharpe(r: pd.Series, rf_rate=0.0, freq=252):
 
     return mu / sd * np.sqrt(freq)
 
+
+def calmar_ratio(r: pd.Series, freq=252):
+    x = (1+r).cumprod()
+    mdd = max(1 - x / x.cummax())
+    mu = r.mean()
+    return mu / mdd * freq

@@ -24,8 +24,8 @@ class CORN(AlgoBase):
 
         # Can use multiprocessing to speed up
         for i in range(w + 1, t + 1):
-            if np.corrcoef(history.iloc[i - 1 - w: i - 1].values.flatten(), price_seq_t)[0,1] >= self.corr_threshold:
-                corr_similar_set.add(i-1)
+            if np.corrcoef(history.iloc[i - 1 - w: i - 1].values.flatten(), price_seq_t)[0, 1] >= self.corr_threshold:
+                corr_similar_set.add(i - 1)
         if corr_similar_set:
             b_tp1 = self.optimize_weight(history.iloc[list(corr_similar_set), :])
 
