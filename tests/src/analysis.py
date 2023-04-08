@@ -37,30 +37,33 @@ nasdaq10_price_relative = AlgoBase.transform_price_data(nasdaq10)
 #
 # print(algo_result.summary())
 
-summary_list = []
-main_path = './data/nasdaq10_corn_10'
-for file_path in os.listdir(main_path):
-    _, _, _, *args = file_path.replace(".csv", "").split("_")
-    weight10 = pd.read_csv(main_path+'/'+file_path, index_col=0)[1:]
-    weight10.index = nasdaq10_price_relative.index
-    weight10.columns = selections
-    algo_result = AlgoResult(nasdaq10_price_relative, weight10)
-    algo_result.fee = 0.02 / 100
-    summary_dict = algo_result.summary()
-    for i, arg in enumerate(args):
-        summary_dict.update({
-            f'args_{i}': arg
-        })
-    summary_list.append(summary_dict)
+# summary_list = []
+# main_path = './data/nasdaq10_corn_10'
+# for file_path in os.listdir(main_path):
+#     _, _, _, *args = file_path.replace(".csv", "").split("_")
+#     weight10 = pd.read_csv(main_path+'/'+file_path, index_col=0)[1:]
+#     weight10.index = nasdaq10_price_relative.index
+#     weight10.columns = selections
+#     algo_result = AlgoResult(nasdaq10_price_relative, weight10)
+#     algo_result.fee = 0.02 / 100
+#     summary_dict = algo_result.summary()
+#     for i, arg in enumerate(args):
+#         summary_dict.update({
+#             f'args_{i}': arg
+#         })
+#     summary_list.append(summary_dict)
+#
+# df = pd.DataFrame(summary_list)
+# result = df.pivot(index='args_0', columns='args_1', values='sharpe_ratio')
+# sns.heatmap(result, annot=True, fmt="g", cmap="viridis")
+# plt.show()
 
-df = pd.DataFrame(summary_list)
-result = df.pivot(index='args_0', columns='args_1', values='sharpe_ratio')
-sns.heatmap(result, annot=True, fmt="g", cmap="viridis")
-plt.show()
-
-benchmark_weight10 = pd.read_csv('result_nasdaq10_crp.csv', index_col=0)[1:]
+# result_nasdaq10_crp.csv
+# result_nasdaq10TC_10_0.1.csv
+benchmark_weight10 = pd.read_csv('result_nasdaq10TC_10_0.1.csv', index_col=0)[1:]
 benchmark_weight10.index = nasdaq10_price_relative.index
 benchmark_weight10.columns = selections
 benchmark_algo_result = AlgoResult(nasdaq10_price_relative, benchmark_weight10)
 benchmark_algo_result.fee = 0.02 / 100
 print(benchmark_algo_result.summary())
+

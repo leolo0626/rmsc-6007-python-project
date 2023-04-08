@@ -1,17 +1,43 @@
+import contextlib
+import multiprocessing
 import numpy as np
 import pandas as pd
 import scipy.optimize as optimize
 import logging
+
+from src.model.opt_weight_param import TCAdjustedReturnOptWeightParam
+
+
+@contextlib.contextmanager
+def mp_pool(n_jobs):
+    n_jobs = multiprocessing.cpu_count() if n_jobs == -1 else n_jobs
+    pool = multiprocessing.Pool(n_jobs)
+    try:
+        yield pool
+    finally:
+        pool.close()
 
 
 def opt_weights(X: pd.DataFrame, **kwargs):
     '''
     X is prices in ratio
     '''
-    objective = lambda b: -np.sum(np.log(np.maximum(np.dot(X - 1, b) + 1, 0.0001)))
-    # Equality constraint means that the constraint function result is to be zero
-    cons = {"type": "eq", "fun": lambda b: 1 - sum(b)}
     x_0 = np.ones(X.shape[1]) / float(X.shape[1])
+    opt_weight_param = kwargs.pop('opt_weight_param')
+    if type(opt_weight_param) == TCAdjustedReturnOptWeightParam:
+        fee = opt_weight_param.fee
+        lda = opt_weight_param.lda
+        b_tm1 = kwargs.pop('b_tm1')
+
+        def objective(b):
+            return -np.sum(np.log(np.maximum(np.dot(X - 1, b) + 1, 0.0001))) + \
+                   np.sum(np.maximum((b - b_tm1).abs() * lda, 1e-10))
+
+        cons = {"type": "ineq", "fun": lambda b: 1 - sum(b) - np.sum(np.maximum((b - b_tm1).abs() * fee, 1e-10))}
+    else:
+        objective = lambda b: -np.sum(np.log(np.maximum(np.dot(X - 1, b) + 1, 0.0001)))
+        # Equality constraint means that the constraint function result is to be zero
+        cons = {"type": "eq", "fun": lambda b: 1 - sum(b)}
 
     while True:
         # problem optimization

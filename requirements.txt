@@ -34,4 +34,6 @@ tomli==2.0.1
 urllib3==1.26.15
 webencodings==0.5.1
 yfinance==0.2.12
-seaborn=0.12.2
+seaborn==0.12.2
+pydantic==1.10.7
+typing-extensions==4.5.0
