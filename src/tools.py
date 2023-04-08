@@ -11,6 +11,7 @@ from src.model.opt_weight_param import TCAdjustedReturnOptWeightParam
 @contextlib.contextmanager
 def mp_pool(n_jobs):
     n_jobs = multiprocessing.cpu_count() if n_jobs == -1 else n_jobs
+    print(f"# of worker: {n_jobs}")
     pool = multiprocessing.Pool(n_jobs)
     try:
         yield pool

@@ -4,6 +4,7 @@ import random
 import numpy as np
 from itertools import product
 from src.algo.CORN import CORN
+from src.tools import mp_pool
 from src.algo.CRP import CRP
 from multiprocessing import Pool
 
@@ -32,7 +33,7 @@ def execute_function(args):
 
     result = CORN(*args).run(nasdaq10)
     result_df = pd.DataFrame(result)
-    result_df.to_csv(f'result_nasdaq10TC_corn_{args[0]:.2%}_{args[1]:.2%}.csv')
+    result_df.to_csv(f'result_nasdaq10TC_corn_{args[0]:.2}_{args[1]:.2}.csv')
     print(f'==========completed {args} ======')
     return True
 
@@ -50,7 +51,7 @@ if __name__ == "__main__":
         for j in range(len(windows)):
             unique_combinations.append((windows[j], rho[i], opt_weight_param))
 
-    with Pool(5) as p:
+    with mp_pool(-1) as p:
         results = p.map(execute_function, unique_combinations)
     # historical_data = get_nasdaq_components_prices(selections)
     # result = CORN(10, 0.1, opt_weight_param).run(historical_data)
