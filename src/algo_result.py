@@ -90,3 +90,5 @@ class AlgoResult:
             'calmar_ratio': self.calmar_ratio,
             'final_wealth': self.total_wealth
         }
+
+
