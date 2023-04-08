@@ -52,6 +52,7 @@ col6.metric("Total Wealth", f"{benchmark_result_summary['final_wealth']:.4f}")
 st.line_chart(benchmark_algo_result.equity_curve)
 # Each asset's performance curve
 fig = px.line(benchmark_algo_result.asset_equity)
+fig.update_layout(legend=dict(orientation="h"))
 st.plotly_chart(fig, theme="streamlit", use_container_width=True)
 # # Decompose asset weight curve
 fig = px.line(benchmark_algo_result.equity_decomposed)
