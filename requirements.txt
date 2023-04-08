@@ -37,4 +37,6 @@ yfinance==0.2.12
 seaborn==0.12.2
 pydantic==1.10.7
 typing-extensions==4.5.0
-streamlit
+streamlit==1.21.0
+plotly==5.14.1
+tenacity==8.2.2

@@ -1,4 +1,5 @@
 import streamlit as st
+import plotly.express as px
 from pathlib import Path
 import pandas as pd
 import os
@@ -45,5 +46,16 @@ col2.metric("Annual Vol (%)", f"{benchmark_result_summary['annualized_volatility
 col3.metric("sharpe Ratio", f"{benchmark_result_summary['sharpe_ratio']:.4f}")
 col4, col6, col5 = st.columns(3)
 col4.metric("Max Drawdown (%)", f"{benchmark_result_summary['mdd']*100:.4f}")
-col5.metric("Calmar Ratio (%)", f"{benchmark_result_summary['calmar_ratio']*100:.4f}")
+col5.metric("Calmar Ratio", f"{benchmark_result_summary['calmar_ratio']:.4f}")
 col6.metric("Total Wealth", f"{benchmark_result_summary['final_wealth']:.4f}")
+# charts
+st.line_chart(benchmark_algo_result.equity_curve)
+# Each asset's performance curve
+fig = px.line(benchmark_algo_result.asset_equity)
+st.plotly_chart(fig, theme="streamlit", use_container_width=True)
+# # Decompose asset weight curve
+fig = px.line(benchmark_algo_result.equity_decomposed)
+fig.update_layout(legend=dict(orientation="h"))
+st.plotly_chart(fig, theme="streamlit", use_container_width=True)
+# # drawdown curve
+st.area_chart(benchmark_algo_result.drawdown_curve)
