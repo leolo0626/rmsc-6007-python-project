@@ -1,4 +1,4 @@
-from src.model.Instrument import HKEquityInstrument, IndexConstituents
+from src.model.Instrument import HKEquityInstrument
 import pandas as pd
 
 

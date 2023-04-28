@@ -1,5 +1,7 @@
 import pandas as pd
 import numpy as np
+
+from src.algo_base import AlgoBase
 from src.tools import sharpe, calmar_ratio, to_rebalance
 
 
@@ -92,3 +94,8 @@ class AlgoResult:
         }
 
 
+def get_algo_result(asset_prices, weights):
+    price_relatives = AlgoBase.transform_price_data(asset_prices)
+    weights = pd.DataFrame(weights[1:], index=price_relatives.index, columns=price_relatives.columns)
+    algo_results = AlgoResult(price_relatives, weights)
+    return algo_results

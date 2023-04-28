@@ -30,6 +30,7 @@ def opt_weights(X: pd.DataFrame, **kwargs):
     if type(opt_weight_param) == TCAdjustedReturnOptWeightParam:
         fee = opt_weight_param.fee
         lda = opt_weight_param.lda
+
         # b_tm1 = kwargs.pop('b_tm1')
 
         def objective(b):
@@ -98,3 +99,4 @@ def to_rebalance(B: np.ndarray, X: pd.DataFrame):
     hold_B = (B * X).div(E, axis=0)
 
     return B - hold_B.shift(1)
+

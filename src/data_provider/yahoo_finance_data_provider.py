@@ -1,7 +1,7 @@
 import yfinance
 import pandas as pd
 from typing import List
-from multiprocessing import Pool
+import multiprocessing as mp
 
 
 class YahooFinanceDataProvider:
@@ -11,7 +11,6 @@ class YahooFinanceDataProvider:
         return yfinance.download(ticker, from_dt, to_dt)
 
     def get_adj_close_of_stock(self, *args):
-        print(args)
         ticker, from_dt, to_dt = args
         try:
             price = self.get_historical_stock_price(ticker, from_dt, to_dt)
@@ -25,7 +24,7 @@ class YahooFinanceDataProvider:
     def get_multiple_stock_prices(self, tickers: List[str], from_dt: str, to_dt: str):
         res = []
         args = [(ticker, from_dt, to_dt) for ticker in tickers]
-        with Pool(5) as p:
+        with mp.Pool() as p:
             res = p.starmap(self.get_adj_close_of_stock, args)
             res = list(filter(lambda df: df is not None, res))
         return pd.concat(res, axis=1)

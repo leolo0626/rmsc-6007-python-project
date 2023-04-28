@@ -29,7 +29,7 @@ class AlgoBase:
         last_weight = self.init_step(m)
 
         for t in range(1, n):
-            # print(f"backtesting t={t}")
+            print(f"backtesting t={t}")
             weights[t] = last_weight
 
             if t < self.min_history:
