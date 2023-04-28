@@ -33,7 +33,7 @@ def execute_function(args):
 
     result = CORN(*args).run(nasdaq10)
     result_df = pd.DataFrame(result)
-    result_df.to_csv(f'result_nasdaq10TC_corn_{args[0]:.2}_{args[1]:.2}.csv')
+    result_df.to_csv(f'result_nasdaq10_corn_{args[0]}_{args[1]}.csv')
     print(f'==========completed {args} ======')
     return True
 

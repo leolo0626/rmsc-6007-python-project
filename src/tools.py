@@ -23,12 +23,14 @@ def opt_weights(X: pd.DataFrame, **kwargs):
     '''
     X is prices in ratio
     '''
-    x_0 = np.ones(X.shape[1]) / float(X.shape[1])
+    b_tm1 = kwargs.pop('b_tm1')
+    # x_0 = np.ones(X.shape[1]) / float(X.shape[1])
+    x_0 = b_tm1
     opt_weight_param = kwargs.pop('opt_weight_param')
     if type(opt_weight_param) == TCAdjustedReturnOptWeightParam:
         fee = opt_weight_param.fee
         lda = opt_weight_param.lda
-        b_tm1 = kwargs.pop('b_tm1')
+        # b_tm1 = kwargs.pop('b_tm1')
 
         def objective(b):
             return -np.sum(np.log(np.maximum(np.dot(X - 1, b) + 1, 0.0001))) + \

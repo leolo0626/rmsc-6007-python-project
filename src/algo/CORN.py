@@ -17,7 +17,8 @@ class CORN(AlgoBase):
         corr_similar_set = set()
         asset_m = len(history.columns)
         t = len(history)
-        b_tp1 = np.ones(asset_m) / asset_m
+        b_tp1 = last_weight
+        # or np.ones(asset_m) / asset_m
 
         if t <= w:
             return b_tp1

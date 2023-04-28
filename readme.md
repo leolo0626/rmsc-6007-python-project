@@ -44,3 +44,9 @@ Input the following command
 ```
 pip install -r requirements.txt
 ```
+
+# Start Streamlit app in local
+
+```angular2html
+streamlit run src/streamlit_app/my_app.py
+```

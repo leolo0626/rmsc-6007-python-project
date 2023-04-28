@@ -60,7 +60,7 @@ nasdaq10_price_relative = AlgoBase.transform_price_data(nasdaq10)
 
 # result_nasdaq10_crp.csv
 # result_nasdaq10TC_10_0.1.csv
-benchmark_weight10 = pd.read_csv('result_nasdaq10TC_10_0.1.csv', index_col=0)[1:]
+benchmark_weight10 = pd.read_csv('data/nasdaq10_cornTC_10/result_nasdaq10TC_10_0.1.csv', index_col=0)[1:]
 benchmark_weight10.index = nasdaq10_price_relative.index
 benchmark_weight10.columns = selections
 benchmark_algo_result = AlgoResult(nasdaq10_price_relative, benchmark_weight10)
