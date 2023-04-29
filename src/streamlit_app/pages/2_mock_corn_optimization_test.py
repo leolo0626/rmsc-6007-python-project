@@ -7,7 +7,7 @@ import pandas as pd
 import os
 import sys
 
-parent_path = str(Path(__file__).resolve().parent.parent.parent)  # /online_portfolio_selection
+parent_path = str(Path(__file__).resolve().parent.parent.parent.parent)  # /online_portfolio_selection
 sys.path.append(parent_path)
 
 from src.algo_result import AlgoResult
