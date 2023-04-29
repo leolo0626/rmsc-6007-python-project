@@ -16,7 +16,7 @@ from src.data_provider.hsi_data_provider import HSIDataProvider
 
 
 def save_df(dataframe):
-    return dataframe.to_csv(index=False).encode('utf-8')
+    return dataframe.to_csv(index=True).encode('utf-8')
 
 
 def create_download_link(val, filename, label):
