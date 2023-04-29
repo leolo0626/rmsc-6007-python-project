@@ -5,7 +5,6 @@ from src.data_provider.fintel_data_provider import FintelDataProvider
 from src.data_provider.yahoo_finance_data_provider import YahooFinanceDataProvider
 import pandas as pd
 
-
 # print(assets)
 # 2022-08-15 #2022-11-14
 from src.model.opt_weight_param import TCAdjustedReturnOptWeightParam
@@ -68,3 +67,6 @@ if __name__ == "__main__":
     # {'annualized_return': -0.1452614281134963, 'annualized_volatility': 0.26936484890803614,
     #  'sharpe_ratio': -0.5392738833680931, 'mdd': 0.1634983188400052, 'calmar_ratio': -0.8884582370271646,
     #  'final_wealth': 0.9557888539134486}
+    # Todo: Optimize different parameters
+
+    # Todo: Min Variance Portfolio

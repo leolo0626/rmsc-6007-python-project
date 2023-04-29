@@ -57,3 +57,6 @@ if __name__ == "__main__":
     # {'annualized_return': -0.14943474112414679, 'annualized_volatility': 0.18410412435845663,
     #  'sharpe_ratio': -0.8116860045633338, 'mdd': 0.11679207351165177, 'calmar_ratio': -1.2794938614497535,
     #  'final_wealth': 0.9593256695361027}
+    # Todo: Optimize different parameters
+
+    # Todo: Min Variance Portfolio
