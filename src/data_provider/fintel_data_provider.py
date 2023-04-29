@@ -55,7 +55,7 @@ class FintelDataProvider:
 
         r = requests.get(f'{self.URL_PREFIX}{temp_df.iloc[0].href}', headers=self.HEADER)
         df = pd.read_html(r.text)[1]
-        df['symbol'] = df['Security'].apply(lambda x: x.split("/")[0])
+        df['symbol'] = df['Security'].apply(lambda x: x.split("/")[0].strip())
         if save_to_csv:
             folder_path = self.get_default_fund_folder(fund_name)
             if not os.path.exists(folder_path):
