@@ -41,3 +41,4 @@ streamlit==1.21.0
 plotly==5.14.1
 tenacity==8.2.2
 openpyxl==3.1.2
+bs4==0.0.1
