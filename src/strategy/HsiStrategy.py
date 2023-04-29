@@ -1,6 +1,6 @@
 from src.algo_base import AlgoBase
 from src.algo_result import AlgoResult, get_algo_result
-from src.data_provider.hsi_data_provider import get_hist_hsi_constituents
+from src.data_provider.hsi_data_provider import HSIDataProvider
 from src.data_provider.yahoo_finance_data_provider import YahooFinanceDataProvider
 from src.model.Instrument import HKEquityInstrument
 from src.algo.CRP import CRP
@@ -17,7 +17,8 @@ from src.model.opt_weight_param import TCAdjustedReturnOptWeightParam
 
 def download_and_save_asset_prices():
     # read hsi constituents
-    hist_hsi_constituents = get_hist_hsi_constituents(save_csv=False)
+    hsi_data_provider = HSIDataProvider()
+    hist_hsi_constituents = hsi_data_provider.get_hist_hsi_constituents(save_csv=False)
 
     # select bear market from 2021-06-07 to 2021-09-05
     constituents_df = hist_hsi_constituents[hist_hsi_constituents['start_date'] == '2021-06-07']
@@ -31,9 +32,9 @@ def download_and_save_asset_prices():
     index_price.to_csv('hsi_index_price.csv', index=True)
 
     # download asset price
-    # constituents_in_yf = [con.yahoo_finance_symbol for con in constituents]
-    # asset_price = yf_provider.get_multiple_stock_prices(constituents_in_yf, from_dt='2015-01-01', to_dt='2021-09-05')
-    # asset_price.to_csv('hsi_con_prices_20210607.csv', index=True)
+    constituents_in_yf = [con.yahoo_finance_symbol for con in constituents]
+    asset_price = yf_provider.get_multiple_stock_prices(constituents_in_yf, from_dt='2015-01-01', to_dt='2021-09-05')
+    asset_price.to_csv('hsi_con_prices_20210607.csv', index=True)
 
 
 if __name__ == "__main__":
