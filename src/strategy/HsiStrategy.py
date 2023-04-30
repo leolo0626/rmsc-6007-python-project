@@ -13,6 +13,7 @@ from src.data_provider.data_helper import count_na_in_dataframe
 import matplotlib.pyplot as plt
 
 from src.model.opt_weight_param import TCAdjustedReturnOptWeightParam
+from src.strategy.strategy_helper import get_algo_runner_req_corn, algo_runner_mp_corn
 
 
 def download_and_save_asset_prices():
@@ -42,9 +43,8 @@ def download_and_save_asset_prices():
     asset_price = yf_provider.get_multiple_stock_prices(constituents_in_yf, from_dt='2012-01-01', to_dt='2017-11-22')
     asset_price.to_csv('hsi_con_prices_20170904.csv', index=True)
 
-
-
-if __name__ == "__main__":
+def algo_container():
+    # To store result
     orig_asset_price = pd.read_csv('../data/HSI Index/hsi_con_prices_20170904.csv')
     #orig_asset_price = pd.read_csv('../data/HSI Index/hsi_con_prices_20210607.csv')
     orig_asset_price.set_index('Date', inplace=True)
@@ -103,6 +103,13 @@ if __name__ == "__main__":
     # 'final_wealth': 1.078218108592712}
 
 
+if __name__ == "__main__":
     # Todo: Optimize different parameters
+    bull_asset_prices = pd.read_csv('../data/HSI Index/hsi_con_prices_20170904.csv')
+    bull_asset_prices.set_index('Date', inplace=True)
+    reqs = get_algo_runner_req_corn()
+    algo_runner_mp_corn(bull_asset_prices, [reqs[0]], 'data/HSI Index/Bull')
+
+
 
     # Todo: Min Variance Portfolio

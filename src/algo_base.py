@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from typing import Optional
+from tqdm import tqdm
 
 
 class AlgoBase:
@@ -29,8 +30,7 @@ class AlgoBase:
 
         last_weight = self.init_step(m)
 
-        for t in range(1, n):
-            print(f"backtesting t={t}")
+        for t in tqdm(range(1, n)):
             weights[t] = last_weight
 
             if t < self.min_history:
