@@ -9,6 +9,8 @@ import pandas as pd
 # 2022-08-15 #2022-11-14
 from src.model.opt_weight_param import TCAdjustedReturnOptWeightParam
 #bull 2021-06-30
+from src.strategy.strategy_helper import get_algo_runner_req_corn, algo_runner_mp_corn
+
 
 def download_and_save_asset_prices():
     current_holdings = FintelDataProvider().get_current_holdings('berkshire-hathaway', '2022-06-30')
@@ -27,7 +29,7 @@ def download_and_save_asset_prices():
     #                   index=True)
 
 
-if __name__ == "__main__":
+def algo_container():
     backtest_start = '2022-08-15'
     backtest_end = '2022-11-13'
     current_holdings = FintelDataProvider().get_current_holdings('berkshire-hathaway', '2022-06-30')
@@ -96,6 +98,12 @@ if __name__ == "__main__":
     # 'sharpe_ratio': 0.6689600156785409, 'mdd': 0.05185758429667253, 'calmar_ratio': 1.401543327894007,
     # 'final_wealth': 1.0168550054417258}
 
+
+if __name__ == "__main__":
     # Todo: Optimize different parameters
+    bear_asset_prices = pd.read_csv('../data/13-F/berkshire-hathaway/berkshire-hathaway_asset_price_2022-06-30.csv')
+    bear_asset_prices.set_index("Date", inplace=True)
+    reqs = get_algo_runner_req_corn()
+    algo_runner_mp_corn(bear_asset_prices, reqs, 'data/13-F/berkshire-hathaway/Bear')
 
     # Todo: Min Variance Portfolio
