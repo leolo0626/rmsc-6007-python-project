@@ -5,18 +5,31 @@ import base64
 
 import sys
 from pathlib import Path
-
-from src.data_provider.yahoo_finance_data_provider import YahooFinanceDataProvider
-from src.model.Instrument import HKEquityInstrument
+from typing import List
 
 parent_path = str(Path(__file__).resolve().parent.parent.parent.parent)  # /online_portfolio_selection
 sys.path.append(parent_path)
 
+from src.algo.CRP import CRP
+from src.algo_result import get_algo_result
+from src.data_provider.yahoo_finance_data_provider import YahooFinanceDataProvider
+from src.model.Instrument import Instrument
 from src.data_provider.hsi_data_provider import HSIDataProvider
+from src.utils.str_utils import str_to_array
 
 
 def save_df(dataframe):
     return dataframe.to_csv(index=True).encode('utf-8')
+
+
+@st.cache_data
+def get_stock_prices(tickers: List[str], from_dt: str, to_dt: str):
+    # https://docs.streamlit.io/library/api-reference/performance/st.cache
+    # Todo: investigate when to clear cache.
+    yf_provider = YahooFinanceDataProvider()
+    stock_prices = yf_provider.get_multiple_stock_prices(tickers, from_dt=from_dt,
+                                                         to_dt=to_dt)
+    return stock_prices
 
 
 def create_download_link(val, filename, label):
@@ -34,12 +47,20 @@ Streamlit. We're generating a bunch of random numbers in a loop for around
 5 seconds. Enjoy!"""
 )
 
-asset_download_text = st.sidebar.markdown("1) Asset Price Download")
-benchmark_download_text = st.sidebar.markdown("2) Benchmark Price Download")
-crp_strategy_text = st.sidebar.markdown("3) CRP Strategy")
-benchmark_buy_and_hold_text = st.sidebar.markdown("4) Benchmark Buy and Hold")
-corn = st.sidebar.markdown("5) CORN Strategy")
+# SideBar status
+ASSET_PRICE_STATUS_PREFIX = "1) Asset Price"
+BENCHMARK_PRICE_STATUS_PREFIX = "2) Benchmark Price"
+CRP_STRATEGY_STATUS_PREFIX = "3) CRP Strategy"
+BENCHMARK_BUY_HOLD_PREFIX = "4) Benchmark Buy and Hold"
+CORN_STRATEGY_PREFIX = "5) CORN Strategy"
 
+asset_download_text = st.sidebar.markdown(f"{ASSET_PRICE_STATUS_PREFIX} Download")
+benchmark_download_text = st.sidebar.markdown(f"{BENCHMARK_PRICE_STATUS_PREFIX} Download")
+crp_strategy_text = st.sidebar.markdown(f"{CRP_STRATEGY_STATUS_PREFIX}")
+benchmark_buy_and_hold_text = st.sidebar.markdown(f"{BENCHMARK_BUY_HOLD_PREFIX}")
+corn = st.sidebar.markdown(f"{CORN_STRATEGY_PREFIX}")
+
+# Main Container
 with st.expander("Portfolio Model Configurations"):
     input11, input12 = st.columns(2)
     with st.container():
@@ -77,11 +98,20 @@ with st.expander("Portfolio Model Configurations"):
         benchmarks = []
         with input41:
             benchmark_input = st.text_input('benchmark input', placeholder="Please input Yahoo Finance Symbol")
+
             if benchmark_input:
-                benchmarks.append(benchmark_input)
+                benchmarks = str_to_array(benchmark_input)
         with input42:
             if benchmarks:
                 st.multiselect('Final Benchmark', benchmarks, benchmarks)
+
+    with st.container():
+        input51, input42 = st.columns(2)
+        with input51:
+            transaction_fee = float(st.text_input("Transaction Fee(%)") or '0')
+
+    with st.container():
+        pass
 
     with st.container():
         on_run = st.button("Analyze Portfolio")
@@ -94,30 +124,78 @@ with st.expander("Asset Viewer"):
             disabled = True
         edited_df = st.experimental_data_editor(df, use_container_width=True, disabled=disabled)
 
-with st.expander("Algo Results"):
-    st.text("No Results")
+# Initialize for results
 
+algo_result_summary_df = pd.DataFrame()
 
+# analyze the data
 if on_run:
 
-    yf_provider = YahooFinanceDataProvider()
-    if data_source == 'HSI':
-        constituents = edited_df.apply(lambda x: HKEquityInstrument(symbol=x['symbol'], location=x['location']),
-                                       axis=1).to_list()
-        constituents_in_yf = [con.yahoo_finance_symbol for con in constituents]
-        asset_download_text.markdown('1) Asset Price Download Start.....')
-        asset_price = yf_provider.get_multiple_stock_prices(constituents_in_yf, from_dt=price_start_date,
-                                                            to_dt=price_end_date)
-        download_url = create_download_link(save_df(asset_price), 'asset_price', '1) Asset Price Download Completed')
-        asset_download_text.markdown(download_url, unsafe_allow_html=True)
+    # Convert the dataframe to Instrument basemodel
+    assets = edited_df.apply(lambda x: Instrument(symbol=x['symbol'], location=x['location']),
+                             axis=1).to_list()
+    assets = [con.yahoo_finance_symbol for con in assets]
 
-        if benchmarks:
-            benchmark_download_text.markdown('2) Benchmarks Price Download Start.....')
-            benchmarks_price = yf_provider.get_multiple_stock_prices(benchmarks, price_start_date, price_end_date)
-            benchmarks_price_download_url = create_download_link(save_df(asset_price),
-                                                                 'benchmarks',
-                                                                 '1) Benchmarks Price Download Completed')
-            benchmark_download_text.markdown(benchmarks_price_download_url, unsafe_allow_html=True)
+    asset_download_text.markdown(f'{ASSET_PRICE_STATUS_PREFIX} Start.....')
+    asset_price = get_stock_prices(assets, price_start_date, price_end_date)
 
+    download_url = create_download_link(save_df(asset_price), 'asset_price', f'{ASSET_PRICE_STATUS_PREFIX} Completed')
+    asset_download_text.markdown(download_url, unsafe_allow_html=True)
 
+    if benchmarks:
+        benchmark_download_text.markdown(f'{BENCHMARK_PRICE_STATUS_PREFIX} Start.....')
+        benchmarks_price = get_stock_prices(benchmarks, price_start_date, price_end_date)
+        benchmarks_price_download_url = create_download_link(save_df(asset_price),
+                                                             'benchmarks',
+                                                             f'{BENCHMARK_PRICE_STATUS_PREFIX} Completed')
+        benchmark_download_text.markdown(benchmarks_price_download_url, unsafe_allow_html=True)
 
+    # '''
+    #     ################################
+    #     ||                            ||
+    #     ||        Algo Result         ||
+    #     ||                            ||
+    #     ################################
+    # '''
+    algo_results = []
+
+    orig_asset_price = asset_price
+    bt_asset_price = orig_asset_price[(orig_asset_price.index >= backtest_start_date.isoformat())
+                                      & (orig_asset_price.index <= backtest_end_date.isoformat())]
+    # CRP
+    crp_strategy_text.text(f"{CRP_STRATEGY_STATUS_PREFIX} Start....")
+    CRP_algo_result = get_algo_result(bt_asset_price, CRP().run(asset_price), algo_name='CRP')
+    CRP_algo_result.fee = transaction_fee / 100
+    algo_results.append(CRP_algo_result)
+    crp_weight_download_url = create_download_link(save_df(CRP_algo_result.weights_to_df),
+                                                   CRP_algo_result.algo_name,
+                                                   f'{CRP_STRATEGY_STATUS_PREFIX} Completed')
+    crp_strategy_text.markdown(crp_weight_download_url, unsafe_allow_html=True)
+    # Benchmarks
+    benchmark_buy_and_hold_text.text(f"{BENCHMARK_BUY_HOLD_PREFIX} Start.....")
+    for benchmark in benchmarks:
+        # it will present when benchmark string is not empty
+        bt_benchmark_price = benchmarks_price.loc[(benchmarks_price.index >= backtest_start_date.isoformat()
+                                                   ) & (benchmarks_price.index <= backtest_end_date.isoformat()),
+                                                  [benchmark]]
+
+        benchmark_algo_result = get_algo_result(bt_benchmark_price, [[1] for i in range(len(bt_benchmark_price))],
+                                                benchmark)
+        benchmark_algo_result.fee = 0
+        algo_results.append(benchmark_algo_result)
+    benchmark_buy_and_hold_text.text(f"{BENCHMARK_BUY_HOLD_PREFIX} Completed.")
+    # CORN
+
+    algo_result_summary_df = pd.DataFrame([algo_result.summary() for algo_result in algo_results])
+
+with st.expander("Algo Results"):
+    if len(algo_result_summary_df) == 0:
+        st.text("No Results")
+    else:
+        with st.container():
+            # https://stackoverflow.com/questions/69875734/how-to-hide-dataframe-index-on-streamlit
+            st.write("Algo Summary")
+            st.dataframe(algo_result_summary_df.set_index("algo_name").transpose(), use_container_width=True)
+
+        with st.container():
+            pass
