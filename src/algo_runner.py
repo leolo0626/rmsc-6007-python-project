@@ -28,11 +28,14 @@ class AlgoRunner:
         self.asset_price = asset_price
 
     def run(self, algo_opt_req: AlgoRunnerReq):
+        import warnings
+        warnings.filterwarnings("ignore")
         print(f"{algo_opt_req} start......")
         algo = algo_opt_req.initialize_algo()
         weight = algo.run(self.asset_price)
         weight_df = pd.DataFrame(weight)
         weight_df.index = self.asset_price.index
+        weight_df.columns = self.asset_price.columns
         print(f"{algo_opt_req} end......")
         return weight_df
 
