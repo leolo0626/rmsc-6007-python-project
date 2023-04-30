@@ -49,4 +49,5 @@ pip install -r requirements.txt
 
 ```angular2html
 streamlit run src/streamlit_app/homepage.py
+
 ```

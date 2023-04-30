@@ -59,6 +59,7 @@ benchmark_download_text = st.sidebar.markdown(f"{BENCHMARK_PRICE_STATUS_PREFIX} 
 crp_strategy_text = st.sidebar.markdown(f"{CRP_STRATEGY_STATUS_PREFIX}")
 benchmark_buy_and_hold_text = st.sidebar.markdown(f"{BENCHMARK_BUY_HOLD_PREFIX}")
 corn = st.sidebar.markdown(f"{CORN_STRATEGY_PREFIX}")
+corn_param = {}
 
 # Main Container
 with st.expander("Portfolio Model Configurations"):
@@ -106,12 +107,21 @@ with st.expander("Portfolio Model Configurations"):
                 st.multiselect('Final Benchmark', benchmarks, benchmarks)
 
     with st.container():
-        input51, input42 = st.columns(2)
+        input51, input52 = st.columns(2)
         with input51:
             transaction_fee = float(st.text_input("Transaction Fee(%)") or '0')
 
     with st.container():
-        st.write("Model Selection:")
+        models = ['CRP', 'CORN']
+        model_selected = st.multiselect("Model Selection:", models)
+
+        if 'CORN' in model_selected:
+            st.write("CORN Parameter")
+            input61, input62 = st.columns(2)
+            with input61:
+                corn_param['window_size'] = st.text_input("Window Size")
+            with input62:
+                corn_param['corr_threshold'] = st.text_input("Correlation Threshold")
 
     with st.container():
         on_run = st.button("Analyze Portfolio")
