@@ -105,10 +105,10 @@ def algo_container():
 
 if __name__ == "__main__":
     # Todo: Optimize different parameters
-    bull_asset_prices = pd.read_csv('../data/HSI Index/hsi_con_prices_20170904.csv')
+    bull_asset_prices = pd.read_csv('../data/HSI Index/hsi_con_prices_20210607.csv')
     bull_asset_prices.set_index('Date', inplace=True)
     reqs = get_algo_runner_req_corn()
-    algo_runner_mp_corn(bull_asset_prices, reqs, 'data/HSI Index/Bull')
+    algo_runner_mp_corn(bull_asset_prices, reqs, 'data/HSI Index/Bear')
 
 
 

@@ -6,6 +6,7 @@ from src.data_provider.yahoo_finance_data_provider import YahooFinanceDataProvid
 import pandas as pd
 
 from src.model.opt_weight_param import TCAdjustedReturnOptWeightParam
+from src.strategy.strategy_helper import get_algo_runner_req_corn, algo_runner_mp_corn
 
 
 def download_and_save_asset_prices():
@@ -22,7 +23,9 @@ def download_and_save_asset_prices():
     asset_price.to_csv('../data/ETF/us_multi_asset_prices_bull.csv',
                        index=True)
 
-if __name__ == "__main__":
+# Todo: Optimize different parameters
+
+def algo_container():
     ################# Bear ########################
     # backtest_start = '2022-08-15'
     # backtest_end = '2022-11-13'
@@ -47,7 +50,7 @@ if __name__ == "__main__":
     # 'sharpe_ratio': -0.8242611829618818, 'mdd': 0.13969165879989487, 'calmar_ratio': -1.3013202131662747,
     # 'final_wealth': 0.9498798816852565}
     ################# Bulll ########################
-    #{'annualized_return': 0.17394676087795613, 'annualized_volatility': 0.09072216165688786,
+    # {'annualized_return': 0.17394676087795613, 'annualized_volatility': 0.09072216165688786,
     # 'sharpe_ratio': 1.9173568806244339, 'mdd': 0.037861662670064744, 'calmar_ratio': 4.594271582676342,
     # 'final_wealth': 1.043373482723385}
 
@@ -61,7 +64,7 @@ if __name__ == "__main__":
     #  'sharpe_ratio': -0.8827942191492348, 'mdd': 0.1668032180043243, 'calmar_ratio': -1.4425201412165694,
     #  'final_wealth': 0.9330481574567427}
     ################# Bulll ########################
-    #{'annualized_return': 0.19693035435412165, 'annualized_volatility': 0.11395130149297053,
+    # {'annualized_return': 0.19693035435412165, 'annualized_volatility': 0.11395130149297053,
     # 'sharpe_ratio': 1.728197499931758, 'mdd': 0.0511413805389247, 'calmar_ratio': 3.85070469899095,
     # 'final_wealth': 1.0487660623786357}
 
@@ -80,10 +83,23 @@ if __name__ == "__main__":
     # 'sharpe_ratio': -0.762505389850429, 'mdd': 0.12047410592963059, 'calmar_ratio': -1.2173632595832966,
     # 'final_wealth': 0.9596259114353459}
     ################# Bulll ########################
-    #{'annualized_return': 0.1945308830264043, 'annualized_volatility': 0.10601163044237195,
+    # {'annualized_return': 0.1945308830264043, 'annualized_volatility': 0.10601163044237195,
     # 'sharpe_ratio': 1.8349956718395302, 'mdd': 0.04718347020899971, 'calmar_ratio': 4.12286086980732,
     # 'final_wealth': 1.048363796999007}
 
     # Todo: Optimize different parameters
 
     # Todo: Min Variance Portfolio
+
+
+if __name__ == "__main__":
+    # Todo: Optimize different parameters
+    #bull_asset_prices = pd.read_csv('../data/ETF/us_multi_asset_prices_bull.csv')
+    #bull_asset_prices.set_index('Date', inplace=True)
+    #reqs = get_algo_runner_req_corn()
+    #algo_runner_mp_corn(bull_asset_prices, reqs, 'data/ETF/Bull')
+    bear_asset_prices = pd.read_csv('../data/ETF/us_multi_asset_prices_bear.csv')
+    bear_asset_prices.set_index('Date', inplace=True)
+    reqs = get_algo_runner_req_corn()
+    algo_runner_mp_corn(bear_asset_prices, reqs, 'data/ETF/Bear')
+

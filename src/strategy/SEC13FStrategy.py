@@ -8,6 +8,9 @@ import pandas as pd
 # print(assets)
 # 2022-08-15 #2022-11-14
 from src.model.opt_weight_param import TCAdjustedReturnOptWeightParam
+from src.strategy.strategy_helper import get_algo_runner_req_corn, algo_runner_mp_corn
+
+
 #bull 2021-06-30
 from src.strategy.strategy_helper import get_algo_runner_req_corn, algo_runner_mp_corn
 
@@ -28,7 +31,6 @@ def download_and_save_asset_prices():
     #asset_price.to_csv('../data/13-F/berkshire-hathaway/berkshire-hathaway_asset_price_2021-06-30.csv',
     #                   index=True)
 
-
 def algo_container():
     backtest_start = '2022-08-15'
     backtest_end = '2022-11-13'
@@ -36,11 +38,11 @@ def algo_container():
     assets = current_holdings.symbol.tolist()
     orig_asset_price = pd.read_csv('../data/13-F/berkshire-hathaway/berkshire-hathaway_asset_price_2022-06-30.csv')
     #################### Bull ################################
-    #backtest_start = '2021-08-16'
-    #backtest_end = '2021-11-14'
-    #current_holdings = FintelDataProvider().get_current_holdings('berkshire-hathaway', '2021-06-30')
-    #assets = current_holdings.symbol.tolist()
-    #orig_asset_price = pd.read_csv('../data/13-F/berkshire-hathaway/berkshire-hathaway_asset_price_2021-06-30.csv')
+    # backtest_start = '2021-08-16'
+    # backtest_end = '2021-11-14'
+    # current_holdings = FintelDataProvider().get_current_holdings('berkshire-hathaway', '2021-06-30')
+    # assets = current_holdings.symbol.tolist()
+    # orig_asset_price = pd.read_csv('../data/13-F/berkshire-hathaway/berkshire-hathaway_asset_price_2021-06-30.csv')
     orig_asset_price.set_index('Date', inplace=True)
     asset_price = orig_asset_price[(orig_asset_price.index >= backtest_start)
                                    & (orig_asset_price.index <= backtest_end)]
@@ -55,11 +57,11 @@ def algo_container():
     algo_result.fee = 0.2 / 100
     print(algo_result.summary())
     ####################### Bear #################################
-    #{'annualized_return': -0.15067973243057642, 'annualized_volatility': 0.26935071983883085,
-    #'sharpe_ratio': -0.559418339482209, 'mdd': 0.16403099766230245, 'calmar_ratio': -0.9186052305844482,
+    # {'annualized_return': -0.15067973243057642, 'annualized_volatility': 0.26935071983883085,
+    # 'sharpe_ratio': -0.559418339482209, 'mdd': 0.16403099766230245, 'calmar_ratio': -0.9186052305844482,
     # 'final_wealth': 0.9544947884623867}
     ####################### Bull #################################
-    #{'annualized_return': 0.07268065127170242, 'annualized_volatility': 0.1086472278884723,
+    # {'annualized_return': 0.07268065127170242, 'annualized_volatility': 0.1086472278884723,
     # 'sharpe_ratio': 0.6689600156785409, 'mdd': 0.05185758429667253, 'calmar_ratio': 1.401543327894007,
     # 'final_wealth': 1.0168550054417258}
 
@@ -71,11 +73,11 @@ def algo_container():
     algo_result.fee = 0.2 / 100
     print(algo_result.summary())
     ####################### Bear #################################
-    #{'annualized_return': -0.16604138845046412, 'annualized_volatility': 0.29653590679385355,
+    # {'annualized_return': -0.16604138845046412, 'annualized_volatility': 0.29653590679385355,
     # 'sharpe_ratio': -0.5599368732296326, 'mdd': 0.17059259293376228, 'calmar_ratio': -0.9733212069467443,
     # 'final_wealth': 0.9490600435353679}
     ####################### Bull #################################
-    #{'annualized_return': 0.11965429859354293, 'annualized_volatility': 0.13489322867045372,
+    # {'annualized_return': 0.11965429859354293, 'annualized_volatility': 0.13489322867045372,
     # 'sharpe_ratio': 0.8870296883905142, 'mdd': 0.05301199955822056, 'calmar_ratio': 2.2571172487491684,
     # 'final_wealth': 1.0280519088023816}
 
@@ -90,20 +92,26 @@ def algo_container():
     algo_result.fee = 0.2 / 100
     print(algo_result.summary())
     ####################### Bear #################################
-    #{'annualized_return': -0.15067973243057642, 'annualized_volatility': 0.26935071983883085,
+    # {'annualized_return': -0.15067973243057642, 'annualized_volatility': 0.26935071983883085,
     # 'sharpe_ratio': -0.559418339482209, 'mdd': 0.16403099766230245, 'calmar_ratio': -0.9186052305844482,
     # 'final_wealth': 0.9544947884623867}
     ####################### Bull #################################
-    #{'annualized_return': 0.07268065127170242, 'annualized_volatility': 0.1086472278884723,
+    # {'annualized_return': 0.07268065127170242, 'annualized_volatility': 0.1086472278884723,
     # 'sharpe_ratio': 0.6689600156785409, 'mdd': 0.05185758429667253, 'calmar_ratio': 1.401543327894007,
     # 'final_wealth': 1.0168550054417258}
 
 
 if __name__ == "__main__":
-    # Todo: Optimize different parameters
-    bear_asset_prices = pd.read_csv('../data/13-F/berkshire-hathaway/berkshire-hathaway_asset_price_2022-06-30.csv')
-    bear_asset_prices.set_index("Date", inplace=True)
+    bull_asset_prices = pd.read_csv('../data/13-F/berkshire-hathaway/berkshire-hathaway_asset_price_2021-06-30.csv')
+    bull_asset_prices.set_index('Date', inplace=True)
     reqs = get_algo_runner_req_corn()
-    algo_runner_mp_corn(bear_asset_prices, reqs, 'data/13-F/berkshire-hathaway/Bear')
+    algo_runner_mp_corn(bull_asset_prices, reqs, 'data/13-F/bull')
+
+
+    # # Todo: Optimize different parameters
+    # bear_asset_prices = pd.read_csv('../data/13-F/berkshire-hathaway/berkshire-hathaway_asset_price_2022-06-30.csv')
+    # bear_asset_prices.set_index("Date", inplace=True)
+    # reqs = get_algo_runner_req_corn()
+    # algo_runner_mp_corn(bear_asset_prices, reqs, 'data/13-F/berkshire-hathaway/Bear')
 
     # Todo: Min Variance Portfolio
