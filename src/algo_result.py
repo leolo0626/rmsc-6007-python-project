@@ -3,12 +3,16 @@ import numpy as np
 
 from src.algo_base import AlgoBase
 from src.tools import sharpe, calmar_ratio, to_rebalance
+from typing import Union
 
 
 class AlgoResult:
-    def __init__(self, X: pd.DataFrame, B: np.ndarray):
+    def __init__(self, X: pd.DataFrame,
+                 B: Union[pd.DataFrame, np.ndarray],
+                 algo_name: str):
         self.X = X
         self.B = B
+        self.algo_name = algo_name
         self._fee = 0.0
         self._recalculate()
 
@@ -36,10 +40,16 @@ class AlgoResult:
         self._fee = value
         self._recalculate()
 
-
     @property
     def weights(self):
         return self.B
+
+    @property
+    def weights_to_df(self):
+        if isinstance(self.B, pd.DataFrame):
+            return self.B
+        else:
+            return pd.DataFrame(self.B)
 
     @property
     def equity_curve(self):
@@ -59,11 +69,11 @@ class AlgoResult:
 
     @property
     def annualized_return(self):
-        return (self.r-1).mean() * 252
+        return (self.r - 1).mean() * 252
 
     @property
     def annualized_volatility(self):
-        return (self.r-1).std() * np.sqrt(252)
+        return (self.r - 1).std() * np.sqrt(252)
 
     @property
     def sharpe_ratio(self):
@@ -85,6 +95,7 @@ class AlgoResult:
 
     def summary(self):
         return {
+            'algo_name': self.algo_name,
             'annualized_return': self.annualized_return,
             'annualized_volatility': self.annualized_volatility,
             'sharpe_ratio': self.sharpe_ratio,
@@ -94,8 +105,8 @@ class AlgoResult:
         }
 
 
-def get_algo_result(asset_prices, weights):
+def get_algo_result(asset_prices, weights, algo_name):
     price_relatives = AlgoBase.transform_price_data(asset_prices)
     weights = pd.DataFrame(weights[1:], index=price_relatives.index, columns=price_relatives.columns)
-    algo_results = AlgoResult(price_relatives, weights)
+    algo_results = AlgoResult(price_relatives, weights, algo_name)
     return algo_results

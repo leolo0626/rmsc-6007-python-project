@@ -6,13 +6,16 @@ class Instrument(BaseModel):
     symbol: str
     location: str
 
+    @property
+    def yahoo_finance_symbol(self):
+        if self.location.lower() == "hk":
+            return '{:0>4}.HK'.format(self.symbol)
+        else:
+            return self.symbol
+
 
 class HKEquityInstrument(Instrument):
     location = 'hk'
-
-    @property
-    def yahoo_finance_symbol(self):
-        return '{:0>4}.HK'.format(self.symbol)
 
     @property
     def aastock_symbol(self):

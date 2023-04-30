@@ -44,7 +44,7 @@ if __name__ == "__main__":
 
     # CRP
     weights = CRP().run(asset_price)
-    algo_result = get_algo_result(asset_price, weights)
+    algo_result = get_algo_result(asset_price, weights, "CRP")
     algo_result.fee = 0.02 / 100
     print(algo_result.summary())
     # {'annualized_return': -0.26274719765320453, 'annualized_volatility': 0.15518998399928477,
@@ -54,7 +54,7 @@ if __name__ == "__main__":
     # index price
     index_price = pd.read_csv('../data/HSI Index/hsi_index_price.csv')
     index_price.set_index('Date', inplace=True)
-    index_result = get_algo_result(index_price, [1 for i in range(len(index_price))])
+    index_result = get_algo_result(index_price, [1 for i in range(len(index_price))], "HSI")
     index_result.fee = 0
     print(index_result.summary())
     # {'annualized_return': -0.40591224034260037, 'annualized_volatility': 0.21547679664078853,
@@ -68,9 +68,9 @@ if __name__ == "__main__":
         lda=0.5
     )
     corn_weights = CORN(window_size=10, corr_threshold=0.3, opt_weights_param=opt_weight_param).run(orig_asset_price)
-    algo_result = get_algo_result(asset_price, corn_weights[-len(asset_price):])
+    algo_result = get_algo_result(asset_price, corn_weights[-len(asset_price):], "CORN")
     algo_result.fee = 0.02 / 100
-    print(algo_result.summary)
+    print(algo_result.summary())
     # {'annualized_return': -0.17875497727374343, 'annualized_volatility': 0.15733456280545932,
     #  'sharpe_ratio': -1.1361456382268018, 'mdd': 0.10299288669357753, 'calmar_ratio': -1.7356050792669966,
     #  'final_wealth': 0.9540816941031289}
