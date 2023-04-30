@@ -256,7 +256,15 @@ with st.expander("Algo Results"):
             st.plotly_chart(fig, theme="streamlit", use_container_width=True)
 
         with st.container():
-            st.write("")
+            st.write("Algo Name")
+            algo_names_option = [algo_result.algo_name for algo_result in algo_results]
+            #Step 1: loop algo name in and select in selectbox
+            algo_option = st.selectbox("Algo Result",(algo_names_option))
+            target_algo_result = [algo_result for algo_result in algo_results if algo_result.algo_name == algo_option][0]
+
+        #Step 2: return value
+        with st.container():
+            st.write("123")
 
         # # Each asset's performance curve
         # fig = px.line(benchmark_algo_result.asset_equity)
@@ -271,4 +279,4 @@ with st.expander("Algo Results"):
         # fig.update_layout(legend=dict(orientation="h"))
         # st.plotly_chart(fig, theme="streamlit", use_container_width=True)
         # # # drawdown curve
-        # st.area_chart(benchmark_algo_result.drawdown_curve)
+        # st.area_chart(benchmark_algo_result.drawdown_curve);
