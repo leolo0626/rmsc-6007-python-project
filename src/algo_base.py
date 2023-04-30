@@ -37,7 +37,6 @@ class AlgoBase:
                 continue
 
             # predict for t+1
-            print(prices_sequence.index)
             history = prices_sequence.iloc[: int(t + 1)]
             last_weight = self.step(last_weight, history)
 

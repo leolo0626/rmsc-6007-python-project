@@ -12,10 +12,19 @@ class FintelDataProvider:
         "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.75 Safari/537.36",
         "X-Requested-With": "XMLHttpRequest"
     }
-    SAVE_PATH_PREFIX = '../data/13-F/'
+
+    def __init__(self, abs_parent_path=None):
+        self.abs_parent_path = abs_parent_path
+        self.save_path_prefix = self._get_path('data/13-F/')
+
+    def _get_path(self, file_path):
+        if self.abs_parent_path:
+            return f'{self.abs_parent_path}/{file_path}'
+        else:
+            return f'../{file_path}'
 
     def get_default_fund_folder(self, fund_name):
-        return f'{self.SAVE_PATH_PREFIX}{fund_name}'
+        return f'{self.save_path_prefix}{fund_name}'
 
     def get_filing_summary(self, fund_name: str, save_to_csv: bool = False):
         url = f"{self.URL_PREFIX}/i13fs/{fund_name}"

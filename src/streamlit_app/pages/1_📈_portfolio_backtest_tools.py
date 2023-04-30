@@ -2,12 +2,11 @@ import pandas as pd
 import streamlit as st
 import datetime
 import base64
+import plotly.express as px
 
 import sys
 from pathlib import Path
 from typing import List
-
-from src.algo.CORN import CORN
 
 parent_path = str(Path(__file__).resolve().parent.parent.parent.parent)  # /online_portfolio_selection
 sys.path.append(parent_path)
@@ -17,8 +16,10 @@ from src.algo_result import get_algo_result
 from src.data_provider.yahoo_finance_data_provider import YahooFinanceDataProvider
 from src.model.Instrument import Instrument
 from src.data_provider.hsi_data_provider import HSIDataProvider
-from src.utils.str_utils import str_to_array
+from src.utils.str_utils import str_to_array, extract_date_str
 from src.model.opt_weight_param import TCAdjustedReturnOptWeightParam
+from src.algo.CORN import CORN
+from src.data_provider.fintel_data_provider import FintelDataProvider
 
 
 def save_df(dataframe):
@@ -78,9 +79,18 @@ with st.expander("Portfolio Model Configurations"):
                 hsi_effective_date = st.selectbox("effective_date", df.start_date.unique().tolist())
                 df = df[df['start_date'] == hsi_effective_date]
             elif data_source == '13-F':
-                pass
+                data_provider = FintelDataProvider(f'{parent_path}/src')
+                fund_name = st.text_input("Fund Name", value="berkshire-hathaway")
+                filing_summary = data_provider.get_filing_summary(fund_name)
+                filing_report_date = st.selectbox("Report Date", filing_summary["Reporting Period"].unique().tolist())
+                df = data_provider.get_current_holdings(fund_name, filing_report_date)
+                df['location'] = 'US'
+                # df = data_p
             elif data_source == 'Default ETF':
-                pass
+                ETFs = ['SPY', 'EFA', 'IEF', 'LQD', 'VNQ', 'GLD', 'USO', 'HYG', 'IWD', 'VUG', 'IWN', 'IWO', 'IWB',
+                        'SDY', 'USMV',
+                        'MTUM', 'QUAL', 'LRGF']
+                df = pd.DataFrame([{'symbol': etf, 'location': 'us'} for etf in ETFs])
             elif data_source == 'Manual':
                 pass
     with st.container():
@@ -155,6 +165,10 @@ if on_run:
     download_url = create_download_link(save_df(asset_price), 'asset_price', f'{ASSET_PRICE_STATUS_PREFIX} Completed')
     asset_download_text.markdown(download_url, unsafe_allow_html=True)
 
+    # ch_for_price_only = current_holdings[current_holdings.symbol.isin(asset_price.columns)]
+    # ch_for_price_only['portfolio_weight_price_only'] = ch_for_price_only.current_value_1000 / \
+    #                                                    ch_for_price_only.current_value_1000.sum()
+
     if benchmarks:
         benchmark_download_text.markdown(f'{BENCHMARK_PRICE_STATUS_PREFIX} Start.....')
         benchmarks_price = get_stock_prices(benchmarks, price_start_date, price_end_date)
@@ -173,6 +187,8 @@ if on_run:
     algo_results = []
 
     orig_asset_price = asset_price
+    orig_asset_price.index = [extract_date_str(idx) for idx in orig_asset_price.index]
+
     bt_asset_price = orig_asset_price[(orig_asset_price.index >= backtest_start_date.isoformat())
                                       & (orig_asset_price.index <= backtest_end_date.isoformat())]
 
@@ -230,4 +246,29 @@ with st.expander("Algo Results"):
             st.dataframe(algo_result_summary_df.set_index("algo_name").transpose(), use_container_width=True)
 
         with st.container():
-            pass
+            st.write("Equity Curve")
+            equity_curve_df = pd.DataFrame(
+                {algo_result.algo_name: algo_result.equity_curve for algo_result in algo_results},
+            )
+
+            fig = px.line(equity_curve_df)
+            fig.update_layout(legend=dict(orientation="h"))
+            st.plotly_chart(fig, theme="streamlit", use_container_width=True)
+
+        with st.container():
+            st.write("")
+
+        # # Each asset's performance curve
+        # fig = px.line(benchmark_algo_result.asset_equity)
+        # fig.update_layout(legend=dict(orientation="h"))
+        # st.plotly_chart(fig, theme="streamlit", use_container_width=True)
+        # # # Decompose asset weight curve
+        # fig = px.line(benchmark_algo_result.equity_decomposed)
+        # fig.update_layout(legend=dict(orientation="h"))
+        # st.plotly_chart(fig, theme="streamlit", use_container_width=True)
+        # # Position chart
+        # fig = px.area(benchmark_algo_result.B)
+        # fig.update_layout(legend=dict(orientation="h"))
+        # st.plotly_chart(fig, theme="streamlit", use_container_width=True)
+        # # # drawdown curve
+        # st.area_chart(benchmark_algo_result.drawdown_curve)
