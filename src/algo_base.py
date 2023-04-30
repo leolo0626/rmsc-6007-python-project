@@ -10,6 +10,7 @@ class AlgoBase:
     @staticmethod
     def transform_price_data(data: pd.DataFrame):
         transformed_data = data / data.shift(1)
+        transformed_data.index = [i for i in range(len(data))]
         transformed_data.drop(index=transformed_data.index[0], axis=0, inplace=True)
         return transformed_data
 
@@ -36,10 +37,8 @@ class AlgoBase:
                 continue
 
             # predict for t+1
-            history = prices_sequence.iloc[: t+1]
+            print(prices_sequence.index)
+            history = prices_sequence.iloc[: int(t + 1)]
             last_weight = self.step(last_weight, history)
 
         return weights
-
-
-

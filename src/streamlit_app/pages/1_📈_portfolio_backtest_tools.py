@@ -7,6 +7,8 @@ import sys
 from pathlib import Path
 from typing import List
 
+from src.algo.CORN import CORN
+
 parent_path = str(Path(__file__).resolve().parent.parent.parent.parent)  # /online_portfolio_selection
 sys.path.append(parent_path)
 
@@ -16,6 +18,7 @@ from src.data_provider.yahoo_finance_data_provider import YahooFinanceDataProvid
 from src.model.Instrument import Instrument
 from src.data_provider.hsi_data_provider import HSIDataProvider
 from src.utils.str_utils import str_to_array
+from src.model.opt_weight_param import TCAdjustedReturnOptWeightParam
 
 
 def save_df(dataframe):
@@ -50,15 +53,15 @@ Streamlit. We're generating a bunch of random numbers in a loop for around
 # SideBar status
 ASSET_PRICE_STATUS_PREFIX = "1) Asset Price"
 BENCHMARK_PRICE_STATUS_PREFIX = "2) Benchmark Price"
-CRP_STRATEGY_STATUS_PREFIX = "3) CRP Strategy"
-BENCHMARK_BUY_HOLD_PREFIX = "4) Benchmark Buy and Hold"
+BENCHMARK_BUY_HOLD_PREFIX = "3) Benchmark Buy and Hold"
+CRP_STRATEGY_STATUS_PREFIX = "4) CRP Strategy"
 CORN_STRATEGY_PREFIX = "5) CORN Strategy"
 
 asset_download_text = st.sidebar.markdown(f"{ASSET_PRICE_STATUS_PREFIX} Download")
 benchmark_download_text = st.sidebar.markdown(f"{BENCHMARK_PRICE_STATUS_PREFIX} Download")
 crp_strategy_text = st.sidebar.markdown(f"{CRP_STRATEGY_STATUS_PREFIX}")
 benchmark_buy_and_hold_text = st.sidebar.markdown(f"{BENCHMARK_BUY_HOLD_PREFIX}")
-corn = st.sidebar.markdown(f"{CORN_STRATEGY_PREFIX}")
+corn_strategy_text = st.sidebar.markdown(f"{CORN_STRATEGY_PREFIX}")
 corn_param = {}
 
 # Main Container
@@ -113,15 +116,15 @@ with st.expander("Portfolio Model Configurations"):
 
     with st.container():
         models = ['CRP', 'CORN']
-        model_selected = st.multiselect("Model Selection:", models)
+        model_selected = st.multiselect("Model Selection:", models, models)
 
         if 'CORN' in model_selected:
             st.write("CORN Parameter")
             input61, input62 = st.columns(2)
             with input61:
-                corn_param['window_size'] = st.text_input("Window Size")
+                corn_param['window_size'] = int(st.text_input("Window Size") or '0')
             with input62:
-                corn_param['corr_threshold'] = st.text_input("Correlation Threshold")
+                corn_param['corr_threshold'] = float(st.text_input("Correlation Threshold") or '0')
 
     with st.container():
         on_run = st.button("Analyze Portfolio")
@@ -172,15 +175,7 @@ if on_run:
     orig_asset_price = asset_price
     bt_asset_price = orig_asset_price[(orig_asset_price.index >= backtest_start_date.isoformat())
                                       & (orig_asset_price.index <= backtest_end_date.isoformat())]
-    # CRP
-    crp_strategy_text.text(f"{CRP_STRATEGY_STATUS_PREFIX} Start....")
-    CRP_algo_result = get_algo_result(bt_asset_price, CRP().run(asset_price), algo_name='CRP')
-    CRP_algo_result.fee = transaction_fee / 100
-    algo_results.append(CRP_algo_result)
-    crp_weight_download_url = create_download_link(save_df(CRP_algo_result.weights_to_df),
-                                                   CRP_algo_result.algo_name,
-                                                   f'{CRP_STRATEGY_STATUS_PREFIX} Completed')
-    crp_strategy_text.markdown(crp_weight_download_url, unsafe_allow_html=True)
+
     # Benchmarks
     benchmark_buy_and_hold_text.text(f"{BENCHMARK_BUY_HOLD_PREFIX} Start.....")
     for benchmark in benchmarks:
@@ -194,7 +189,34 @@ if on_run:
         benchmark_algo_result.fee = 0
         algo_results.append(benchmark_algo_result)
     benchmark_buy_and_hold_text.text(f"{BENCHMARK_BUY_HOLD_PREFIX} Completed.")
+    # CRP
+    if "CRP" in model_selected:
+        crp_strategy_text.text(f"{CRP_STRATEGY_STATUS_PREFIX} Start....")
+        CRP_algo_result = get_algo_result(bt_asset_price, CRP().run(bt_asset_price), algo_name='CRP')
+        CRP_algo_result.fee = transaction_fee / 100
+        algo_results.append(CRP_algo_result)
+        crp_weight_download_url = create_download_link(save_df(CRP_algo_result.weights_to_df),
+                                                       CRP_algo_result.algo_name,
+                                                       f'{CRP_STRATEGY_STATUS_PREFIX} Completed')
+        crp_strategy_text.markdown(crp_weight_download_url, unsafe_allow_html=True)
+
     # CORN
+    if "CORN" in model_selected:
+        corn_strategy_text.text(f"{CORN_STRATEGY_PREFIX} Start....")
+        opt_weight_param = TCAdjustedReturnOptWeightParam(
+            fee=transaction_fee / 100,
+            lda=0.5
+        )
+        CORN_algo_result = get_algo_result(bt_asset_price,
+                                           CORN(**{**corn_param, "opt_weights_param": opt_weight_param}).run(
+                                               orig_asset_price)[-len(bt_asset_price):],
+                                           algo_name='CORN')
+        CORN_algo_result.fee = transaction_fee / 100
+        algo_results.append(CORN_algo_result)
+        corn_weight_download_url = create_download_link(save_df(CORN_algo_result.weights_to_df),
+                                                        CORN_algo_result.algo_name,
+                                                        f'{CORN_STRATEGY_PREFIX} Completed')
+        corn_strategy_text.markdown(corn_weight_download_url, unsafe_allow_html=True)
 
     algo_result_summary_df = pd.DataFrame([algo_result.summary() for algo_result in algo_results])
 

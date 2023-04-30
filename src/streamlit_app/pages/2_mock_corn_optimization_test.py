@@ -51,7 +51,7 @@ if heatmap_enabled:
         weight10 = pd.read_csv(main_path + '/' + file_path, index_col=0)[1:]
         weight10.index = nasdaq10_price_relative.index
         weight10.columns = selections
-        algo_result = AlgoResult(nasdaq10_price_relative, weight10)
+        algo_result = AlgoResult(nasdaq10_price_relative, weight10, 'CORN')
         algo_result.fee = tc
         summary_dict = algo_result.summary()
         for i, arg in enumerate(args):
@@ -76,7 +76,7 @@ st.write('You selected', option)
 benchmark_weight10 = pd.read_csv(parent_path + f'/tests/src/data/{folder_option}/' + option, index_col=0)[1:]
 benchmark_weight10.index = nasdaq10_price_relative.index
 benchmark_weight10.columns = selections
-benchmark_algo_result = AlgoResult(nasdaq10_price_relative, benchmark_weight10)
+benchmark_algo_result = AlgoResult(nasdaq10_price_relative, benchmark_weight10, 'benchmark')
 benchmark_algo_result.fee = 0.02 / 100
 tc = float(st.text_input("Transaction Fee (%): ", 0.02, key='tc-for-single-file')) / 100
 st.write("The current TC: ", tc)
