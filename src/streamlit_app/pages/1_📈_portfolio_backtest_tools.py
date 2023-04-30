@@ -111,7 +111,7 @@ with st.expander("Portfolio Model Configurations"):
             transaction_fee = float(st.text_input("Transaction Fee(%)") or '0')
 
     with st.container():
-        pass
+        st.write("Model Selection:")
 
     with st.container():
         on_run = st.button("Analyze Portfolio")
