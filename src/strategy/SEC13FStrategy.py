@@ -11,20 +11,20 @@ from src.model.opt_weight_param import TCAdjustedReturnOptWeightParam
 #bull 2021-06-30
 
 def download_and_save_asset_prices():
-    #current_holdings = FintelDataProvider().get_current_holdings('berkshire-hathaway', '2022-06-30')
-    #assets = current_holdings.symbol.tolist()
-    #yf_provider = YahooFinanceDataProvider()
-    #asset_price = yf_provider.get_multiple_stock_prices(assets, from_dt='2017-01-01',
-    #                                                    to_dt='2022-11-13')
-    #asset_price.to_csv('../data/13-F/berkshire-hathaway/berkshire-hathaway_asset_price_2022-06-30.csv',
-    #                   index=True)
-    current_holdings = FintelDataProvider().get_current_holdings('berkshire-hathaway', '2021-06-30')
+    current_holdings = FintelDataProvider().get_current_holdings('berkshire-hathaway', '2022-06-30')
     assets = current_holdings.symbol.tolist()
     yf_provider = YahooFinanceDataProvider()
-    asset_price = yf_provider.get_multiple_stock_prices(assets, from_dt='2016-01-01',
-                                                        to_dt='2021-11-14')
-    asset_price.to_csv('../data/13-F/berkshire-hathaway/berkshire-hathaway_asset_price_2021-06-30.csv',
+    asset_price = yf_provider.get_multiple_stock_prices(assets, from_dt='2017-01-01',
+                                                        to_dt='2022-11-13')
+    asset_price.to_csv('../data/13-F/berkshire-hathaway/berkshire-hathaway_asset_price_2022-06-30.csv',
                        index=True)
+    #current_holdings = FintelDataProvider().get_current_holdings('berkshire-hathaway', '2021-06-30')
+    #assets = current_holdings.symbol.tolist()
+    #yf_provider = YahooFinanceDataProvider()
+    #asset_price = yf_provider.get_multiple_stock_prices(assets, from_dt='2016-01-01',
+    #                                                    to_dt='2021-11-14')
+    #asset_price.to_csv('../data/13-F/berkshire-hathaway/berkshire-hathaway_asset_price_2021-06-30.csv',
+    #                   index=True)
 
 
 if __name__ == "__main__":
