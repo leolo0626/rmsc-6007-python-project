@@ -44,12 +44,7 @@ def create_download_link(val, filename, label):
 st.set_page_config(page_title="Portfolio Backtest tool", page_icon="📈")
 
 st.markdown("# Portfolio Backtest tool")
-st.sidebar.header("Plotting Demo")
-st.write(
-    """This demo illustrates a combination of plotting and animation with
-Streamlit. We're generating a bunch of random numbers in a loop for around
-5 seconds. Enjoy!"""
-)
+st.sidebar.header("Process")
 
 # SideBar status
 ASSET_PRICE_STATUS_PREFIX = "1) Asset Price"
