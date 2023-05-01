@@ -2,6 +2,8 @@ import pandas as pd
 from pydantic import BaseModel
 from typing import Dict, Any
 
+from src.algo.CORN import CORN
+
 
 class AlgoRunnerReq(BaseModel):
     params: Dict[str, Any]
@@ -14,8 +16,29 @@ class AlgoRunnerReq(BaseModel):
         param_str = "_".join([f"[{param},{self.params[param]}]" for param in self.params])
         return f"{self.algo_class.__name__}_{param_str}.csv"
 
+    @classmethod
+    def extract_params_from_file_name(cls, file_name):
+        class_name = file_name.split('_')[0]
+        parts = file_name.strip(".csv").split('_[')[1:]
+
+        # Extract the values of interest
+        params = {}
+        for part in parts:
+            key, value = part.split(',', 1)
+            params[key] = value[:-1]
+
+        # Create and return the dictionary
+        if class_name == "CORN":
+            return AlgoRunnerReq(
+                algo_class=CORN,
+                params=params
+            )
+        else:
+            raise ValueError(f"{class_name} is not supported")
+
     def __str__(self):
         return f"{self.algo_class.__name__}: {self.params}"
+
 
 class AlgoRunner:
     def __init__(self,

@@ -246,7 +246,7 @@ with st.expander("Algo Results"):
             st.dataframe(algo_result_summary_df.set_index("algo_name").transpose(), use_container_width=True)
 
         with st.container():
-            st.write("Equity Curve")
+            st.write("###Equity Curve")
             equity_curve_df = pd.DataFrame(
                 {algo_result.algo_name: algo_result.equity_curve for algo_result in algo_results},
             )
@@ -266,43 +266,23 @@ with st.expander("Algo Results"):
 
         # Step 2: return value
         with st.container():
-            print(target_algo_result)
             st.write("### Asset's performance curve")
             fig = px.line(target_algo_result.asset_equity)
-            target_algo_result.asset_equity.to_csv('curve.csv')
             fig.update_layout(legend=dict(orientation="h"))
             st.plotly_chart(fig, theme="streamlit", use_container_width=True)
 
         with st.container():
-            print(target_algo_result)
             st.write("### Decompose asset weight curve")
             fig = px.line(target_algo_result.equity_decomposed)
             fig.update_layout(legend=dict(orientation="h"))
             st.plotly_chart(fig, theme="streamlit", use_container_width=True)
 
         with st.container():
-            print(target_algo_result)
             st.write("### Position chart")
             fig = px.area(target_algo_result.B)
             fig.update_layout(legend=dict(orientation="h"))
             st.plotly_chart(fig, theme="streamlit", use_container_width=True)
 
         with st.container():
-            print(target_algo_result)
             st.write("### Drawdown Curve")
             st.area_chart(target_algo_result.drawdown_curve)
-
-        # # Each asset's performance curve
-        # fig = px.line(benchmark_algo_result.asset_equity)
-        # fig.update_layout(legend=dict(orientation="h"))
-        # st.plotly_chart(fig, theme="streamlit", use_container_width=True)
-        # # # Decompose asset weight curve
-        # fig = px.line(benchmark_algo_result.equity_decomposed)
-        # fig.update_layout(legend=dict(orientation="h"))
-        # st.plotly_chart(fig, theme="streamlit", use_container_width=True)
-        # # Position chart
-        # fig = px.area(benchmark_algo_result.B)
-        # fig.update_layout(legend=dict(orientation="h"))
-        # st.plotly_chart(fig, theme="streamlit", use_container_width=True)
-        # # # drawdown curve
-        # st.area_chart(benchmark_algo_result.drawdown_curve);
