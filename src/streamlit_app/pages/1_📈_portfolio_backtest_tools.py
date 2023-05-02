@@ -241,7 +241,7 @@ with st.expander("Algo Results"):
             st.dataframe(algo_result_summary_df.set_index("algo_name").transpose(), use_container_width=True)
 
         with st.container():
-            st.write("###Equity Curve")
+            st.write("### Equity Curve")
             equity_curve_df = pd.DataFrame(
                 {algo_result.algo_name: algo_result.equity_curve for algo_result in algo_results},
             )

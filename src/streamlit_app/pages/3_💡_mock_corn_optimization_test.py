@@ -93,7 +93,7 @@ col4.metric("Max Drawdown (%)", f"{benchmark_result_summary['mdd'] * 100:.4f}")
 col5.metric("Calmar Ratio", f"{benchmark_result_summary['calmar_ratio']:.4f}")
 col6.metric("Total Wealth", f"{benchmark_result_summary['final_wealth']:.4f}")
 # charts
-st.write("###Equity Curve")
+st.write("### Equity Curve")
 st.line_chart(benchmark_algo_result.equity_curve)
 # Each asset's performance curve
 st.write("### Asset's performance curve")

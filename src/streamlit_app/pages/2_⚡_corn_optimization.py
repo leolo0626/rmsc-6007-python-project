@@ -181,7 +181,7 @@ with st.expander("Single Algo Result"):
     col6.metric("Total Wealth", f"{algo_result_summary['final_wealth']:.4f}")
     # charts
     with st.container():
-        st.write("###Equity Curve")
+        st.write("### Equity Curve")
         equity_curve_df = pd.DataFrame(
             {algo_result.algo_name: algo_result.equity_curve},
         )
