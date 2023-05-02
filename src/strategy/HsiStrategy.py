@@ -61,7 +61,7 @@ def algo_container():
     #'sharpe_ratio': -1.7313812652824359, 'mdd': 0.11398309646926885, 'calmar_ratio': -2.3572395177004264,
     # 'final_wealth': 0.933257826130966}
 
-    ########## Bull (23/10/2017 - 22/01/2018) #############################
+    ########## Bull (04/09/2017 - 22/11/2017) #############################
     #{'annualized_return': 0.20515909226032236, 'annualized_volatility': 0.10388286677954997,
     # 'sharpe_ratio': 1.9749078805814138, 'mdd': 0.030035916597517365, 'calmar_ratio': 6.8304588473014975,
     # 'final_wealth': 1.043740675328894}
@@ -78,7 +78,7 @@ def algo_container():
     # {'annualized_return': -0.40591224034260037, 'annualized_volatility': 0.21547679664078853,
     #  'sharpe_ratio': -1.8837863132858712, 'mdd': 0.1515455665603621, 'calmar_ratio': -2.6784831094410237,
     #  'final_wealth': 0.8997720822192036}
-    ########## Bull (23/10/2017 - 22/01/2018) #############################
+    ########## Bull (04/09/2017 - 22/11/2017) #############################
     #{'annualized_return': 0.34435172656303775, 'annualized_volatility': 0.12003637926813283,
     # 'sharpe_ratio': 2.8687280361384246, 'mdd': 0.02621363506032326, 'calmar_ratio': 13.136359218040907,
     # 'final_wealth': 1.0749023464246643}
@@ -97,7 +97,7 @@ def algo_container():
     #{'annualized_return': -0.21119781724166015, 'annualized_volatility': 0.15692287402854893,
     # 'sharpe_ratio': -1.3458701833566789, 'mdd': 0.10745529937197351, 'calmar_ratio': -1.96544813030175,
     # 'final_wealth': 0.9465048976740286}
-    ########## Bull (23/10/2017 - 22/01/2018) ############################# CORN
+    ########## Bull (04/09/2017 - 22/11/2017) ############################# CORN
     #{'annualized_return': 0.35879360923368975, 'annualized_volatility': 0.1203789125949236,
     # 'sharpe_ratio': 2.980535390289114, 'mdd': 0.030786432534476216, 'calmar_ratio': 11.65427689070159,
     # 'final_wealth': 1.078218108592712}
@@ -109,7 +109,6 @@ if __name__ == "__main__":
     bull_asset_prices.set_index('Date', inplace=True)
     reqs = get_algo_runner_req_corn()
     algo_runner_mp_corn(bull_asset_prices, reqs, 'data/HSI Index/Bear')
-
 
 
     # Todo: Min Variance Portfolio
