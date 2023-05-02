@@ -8,6 +8,9 @@ import sys
 from pathlib import Path
 from typing import List
 
+from src.streamlit_app.const import algo_mapping
+from src.utils.date_utils import from_isoformat
+
 parent_path = str(Path(__file__).resolve().parent.parent.parent.parent)  # /online_portfolio_selection
 sys.path.append(parent_path)
 
@@ -62,27 +65,57 @@ corn_param = {}
 
 # Main Container
 with st.expander("Portfolio Model Configurations"):
+    with st.container():
+        st.write("##### Saved Param")
+        col11, col12 = st.columns(2)
+
+        with col11:
+            saved_algo = st.selectbox("Algo", [
+                "HSI",
+                "Multi-Asset(ETFs)",
+                "13-F"
+            ])
+        with col12:
+            saved_scenario = st.selectbox("Scenario", [
+                "BULL",
+                "BEAR"
+            ])
+
+    saved_param = algo_mapping.get(saved_algo).get(saved_scenario)
     with st.form("portfolio_configuration_form"):
         input11, input12 = st.columns(2)
         with st.container():
             with input11:
-                data_source = st.selectbox("Data Source", ('HSI', '13-F', 'Default ETF', 'Manual'))
+                data_source_option = ('HSI', '13-F', 'Multi-Asset(ETFs)', 'Manual')
+                data_source = st.selectbox("Data Source", data_source_option,
+                                           index=data_source_option.index(saved_algo))
             with input12:
                 df = pd.DataFrame([{'symbol': '700', 'location': 'hk', 'weight_percent': 100}])
                 if data_source == 'HSI':
                     data_provider = HSIDataProvider(f'{parent_path}/src')
                     df = data_provider.get_hist_hsi_constituents(save_csv=False)
-                    hsi_effective_date = st.selectbox("effective_date", df.start_date.unique().tolist())
+                    hsi_effective_date_option = df.start_date.unique().tolist()
+                    hsi_effective_date = st.selectbox("effective_date", hsi_effective_date_option,
+                                                      index=hsi_effective_date_option.index(
+                                                          saved_param['bt_start_date']))
                     df = df[df['start_date'] == hsi_effective_date]
                 elif data_source == '13-F':
                     data_provider = FintelDataProvider(f'{parent_path}/src')
                     fund_name = st.text_input("Fund Name", value="berkshire-hathaway")
                     filing_summary = data_provider.get_filing_summary(fund_name)
-                    filing_report_date = st.selectbox("Report Date", filing_summary["Reporting Period"].unique().tolist())
+                    saved_param_reporting_period = \
+                    filing_summary[filing_summary['File Date'] == saved_param['bt_start_date']].iloc[0][
+                        "Reporting Period"]
+                    filing_report_date_option = filing_summary["Reporting Period"].unique().tolist()
+                    filing_report_date = st.selectbox("Report Date",
+                                                      filing_report_date_option,
+                                                      index=filing_report_date_option.index(
+                                                          saved_param_reporting_period
+                                                      ))
                     df = data_provider.get_current_holdings(fund_name, filing_report_date)
                     df['location'] = 'US'
                     # df = data_p
-                elif data_source == 'Default ETF':
+                elif data_source == 'Multi-Asset(ETFs)':
                     ETFs = ['SPY', 'EFA', 'IEF', 'LQD', 'VNQ', 'GLD', 'USO', 'HYG', 'IWD', 'VUG', 'IWN', 'IWO', 'IWB',
                             'SDY', 'USMV',
                             'MTUM', 'QUAL', 'LRGF']
@@ -92,16 +125,16 @@ with st.expander("Portfolio Model Configurations"):
         with st.container():
             input21, input22 = st.columns(2)
             with input21:
-                backtest_start_date = st.date_input('Backtest Start Date', datetime.date(2022, 8, 15))
+                backtest_start_date = st.date_input('Backtest Start Date', from_isoformat(saved_param['bt_start_date']))
             with input22:
-                backtest_end_date = st.date_input('Backtest End Date', datetime.date(2022, 11, 13))
+                backtest_end_date = st.date_input('Backtest End Date', from_isoformat(saved_param['bt_end_date']))
 
         with st.container():
             input31, input32 = st.columns(2)
             with input31:
-                price_start_date = st.date_input('Price Start Date', datetime.date(2022, 8, 15))
+                price_start_date = st.date_input('Price Start Date', from_isoformat(saved_param['price_start_date']))
             with input32:
-                price_end_date = st.date_input('Price End Date', backtest_end_date)
+                price_end_date = st.date_input('Price End Date', from_isoformat(saved_param['price_end_date']))
 
         with st.container():
             input41, input42 = st.columns(2)
@@ -141,7 +174,7 @@ with st.expander("Asset Viewer"):
         disabled = False
         if data_source in ['HSI', '13-F']:
             disabled = True
-        edited_df = st.experimental_data_editor(df, use_container_width=True, disabled=disabled,num_rows="dynamic")
+        edited_df = st.experimental_data_editor(df, use_container_width=True, disabled=disabled, num_rows="dynamic")
 
 # Initialize for results
 
@@ -251,13 +284,12 @@ with st.expander("Algo Results"):
             fig.update_layout(legend=dict(orientation="h"))
             st.plotly_chart(fig, theme="streamlit", use_container_width=True)
 
-
         algo_names_option = [algo_result.algo_name for algo_result in algo_results]
         # Step 1: loop algo name in and select in selectbox
         with st.form("my_form"):
             algo_option = st.selectbox("Algo Result", (algo_names_option))
             target_algo_result = \
-            [algo_result for algo_result in algo_results if algo_result.algo_name == algo_option][0]
+                [algo_result for algo_result in algo_results if algo_result.algo_name == algo_option][0]
             st.form_submit_button(disabled=True)
 
         # Step 2: return value
