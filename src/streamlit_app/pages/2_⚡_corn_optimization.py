@@ -37,7 +37,7 @@ def get_weight_df(data_folder, algo_req):
 
 st.write("Analysis of Algo Results")
 
-algo_option_list = ["13-F", "HSI", "Multi-Asset(ETFs)"]
+algo_option_list = ["HSI", "13-F", "Multi-Asset(ETFs)"]
 scenario_option_list = ["BULL", "BEAR"]
 
 algo_mapping = {
@@ -113,7 +113,7 @@ with st.expander("Basic Configuration"):
 algo_runner_reqs = [AlgoRunnerReq.extract_params_from_file_name(file) for file in file_list]
 bt_asset_price = asset_price[(asset_price.index >= bt_start_dt) & (asset_price.index <= bt_end_dt)]
 with st.expander("HeatMap"):
-    tc = float(st.text_input("Transaction Fee (%): ", 0.02)) / 100
+    tc = float(st.text_input("Transaction Fee (%): ", 0.2)) / 100
     evaluation_option = 'sharpe_ratio'
     evaluation_key = ['annualized_return', 'annualized_volatility', 'sharpe_ratio', 'mdd', 'calmar_ratio',
                       'final_wealth']
@@ -166,8 +166,8 @@ with st.expander("Single Algo Result"):
     algo_result = get_algo_result(bt_asset_price, bt_single_algo_weight.to_numpy(), "CORN")
 
     #
-    algo_result.fee = 0.02 / 100
-    tc = float(st.text_input("Transaction Fee (%): ", 0.02, key='tc-for-single-file')) / 100
+    algo_result.fee = 0.2 / 100
+    tc = float(st.text_input("Transaction Fee (%): ", 0.2, key='tc-for-single-file')) / 100
     algo_result.fee = tc
     algo_result_summary = algo_result.summary()
     # matrix
