@@ -17,6 +17,7 @@ from src.algo_base import AlgoBase
 
 from src.algo_runner import AlgoRunnerReq
 from src.utils.date_utils import from_isoformat
+from src.streamlit_app.const import algo_mapping
 
 selections = ['DXCM', 'MTCH', 'ADBE', 'BIIB', 'TXN', 'PCAR', 'FAST', 'MSFT', 'GILD', 'ADI']
 
@@ -40,50 +41,6 @@ st.write("Analysis of Algo Results")
 algo_option_list = ["HSI", "13-F", "Multi-Asset(ETFs)"]
 scenario_option_list = ["BULL", "BEAR"]
 
-algo_mapping = {
-    "13-F": {
-        "BULL": {
-            "bt_start_date": "2021-08-16",
-            "bt_end_date": "2021-11-14",
-            "file_path": "data/13-F/berkshire-hathaway/Bull",
-            "price_data_path": "data/13-F/berkshire-hathaway/berkshire-hathaway_asset_price_2021-06-30.csv"
-        },
-        "BEAR": {
-            "bt_start_date": "2022-08-15",
-            "bt_end_date": "2022-11-13",
-            "file_path": "data/13-F/berkshire-hathaway/Bear",
-            "price_data_path": "data/13-F/berkshire-hathaway/berkshire-hathaway_asset_price_2022-06-30.csv"
-        },
-    },
-    "HSI": {
-        "BULL": {
-            "bt_start_date": "2017-09-04",
-            "bt_end_date": "2017-11-22",
-            "file_path": "data/HSI Index/Bull",
-            "price_data_path": "data/HSI Index/hsi_con_prices_20170904.csv"
-        },
-        "BEAR": {
-            "bt_start_date": "2021-06-07",
-            "bt_end_date": "2021-09-05",
-            "file_path": "data/HSI Index/Bear",
-            "price_data_path": "data/HSI Index/hsi_con_prices_20210607.csv"
-        }
-    },
-    "Multi-Asset(ETFs)": {
-        "BULL": {
-            "bt_start_date": "2021-08-16",
-            "bt_end_date": "2021-11-14",
-            "file_path": "data/ETF/Bull",
-            "price_data_path": "data/ETF/us_multi_asset_prices_bull.csv"
-        },
-        "BEAR": {
-            "bt_start_date": "2022-08-15",
-            "bt_end_date": "2022-11-13",
-            "file_path": "data/ETF/Bear",
-            "price_data_path": "data/ETF/us_multi_asset_prices_bear.csv"
-        }
-    }
-}
 with st.expander("Basic Configuration"):
     with st.container():
         input11, input12 = st.columns(2)

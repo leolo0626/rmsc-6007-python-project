@@ -62,77 +62,78 @@ corn_param = {}
 
 # Main Container
 with st.expander("Portfolio Model Configurations"):
-    input11, input12 = st.columns(2)
-    with st.container():
-        with input11:
-            data_source = st.selectbox("Data Source", ('HSI', '13-F', 'Default ETF', 'Manual'))
-        with input12:
-            df = pd.DataFrame([{'symbol': '700', 'location': 'hk', 'weight_percent': 100}])
-            if data_source == 'HSI':
-                data_provider = HSIDataProvider(f'{parent_path}/src')
-                df = data_provider.get_hist_hsi_constituents(save_csv=False)
-                hsi_effective_date = st.selectbox("effective_date", df.start_date.unique().tolist())
-                df = df[df['start_date'] == hsi_effective_date]
-            elif data_source == '13-F':
-                data_provider = FintelDataProvider(f'{parent_path}/src')
-                fund_name = st.text_input("Fund Name", value="berkshire-hathaway")
-                filing_summary = data_provider.get_filing_summary(fund_name)
-                filing_report_date = st.selectbox("Report Date", filing_summary["Reporting Period"].unique().tolist())
-                df = data_provider.get_current_holdings(fund_name, filing_report_date)
-                df['location'] = 'US'
-                # df = data_p
-            elif data_source == 'Default ETF':
-                ETFs = ['SPY', 'EFA', 'IEF', 'LQD', 'VNQ', 'GLD', 'USO', 'HYG', 'IWD', 'VUG', 'IWN', 'IWO', 'IWB',
-                        'SDY', 'USMV',
-                        'MTUM', 'QUAL', 'LRGF']
-                df = pd.DataFrame([{'symbol': etf, 'location': 'us'} for etf in ETFs])
-            elif data_source == 'Manual':
-                pass
-    with st.container():
-        input21, input22 = st.columns(2)
-        with input21:
-            backtest_start_date = st.date_input('Backtest Start Date', datetime.date(2022, 8, 15))
-        with input22:
-            backtest_end_date = st.date_input('Backtest End Date', datetime.date(2022, 11, 13))
+    with st.form("portfolio_configuration_form"):
+        input11, input12 = st.columns(2)
+        with st.container():
+            with input11:
+                data_source = st.selectbox("Data Source", ('HSI', '13-F', 'Default ETF', 'Manual'))
+            with input12:
+                df = pd.DataFrame([{'symbol': '700', 'location': 'hk', 'weight_percent': 100}])
+                if data_source == 'HSI':
+                    data_provider = HSIDataProvider(f'{parent_path}/src')
+                    df = data_provider.get_hist_hsi_constituents(save_csv=False)
+                    hsi_effective_date = st.selectbox("effective_date", df.start_date.unique().tolist())
+                    df = df[df['start_date'] == hsi_effective_date]
+                elif data_source == '13-F':
+                    data_provider = FintelDataProvider(f'{parent_path}/src')
+                    fund_name = st.text_input("Fund Name", value="berkshire-hathaway")
+                    filing_summary = data_provider.get_filing_summary(fund_name)
+                    filing_report_date = st.selectbox("Report Date", filing_summary["Reporting Period"].unique().tolist())
+                    df = data_provider.get_current_holdings(fund_name, filing_report_date)
+                    df['location'] = 'US'
+                    # df = data_p
+                elif data_source == 'Default ETF':
+                    ETFs = ['SPY', 'EFA', 'IEF', 'LQD', 'VNQ', 'GLD', 'USO', 'HYG', 'IWD', 'VUG', 'IWN', 'IWO', 'IWB',
+                            'SDY', 'USMV',
+                            'MTUM', 'QUAL', 'LRGF']
+                    df = pd.DataFrame([{'symbol': etf, 'location': 'us'} for etf in ETFs])
+                elif data_source == 'Manual':
+                    pass
+        with st.container():
+            input21, input22 = st.columns(2)
+            with input21:
+                backtest_start_date = st.date_input('Backtest Start Date', datetime.date(2022, 8, 15))
+            with input22:
+                backtest_end_date = st.date_input('Backtest End Date', datetime.date(2022, 11, 13))
 
-    with st.container():
-        input31, input32 = st.columns(2)
-        with input31:
-            price_start_date = st.date_input('Price Start Date', datetime.date(2022, 8, 15))
-        with input32:
-            price_end_date = st.date_input('Price End Date', backtest_end_date)
+        with st.container():
+            input31, input32 = st.columns(2)
+            with input31:
+                price_start_date = st.date_input('Price Start Date', datetime.date(2022, 8, 15))
+            with input32:
+                price_end_date = st.date_input('Price End Date', backtest_end_date)
 
-    with st.container():
-        input41, input42 = st.columns(2)
-        benchmarks = []
-        with input41:
-            benchmark_input = st.text_input('benchmark input', placeholder="Please input Yahoo Finance Symbol")
+        with st.container():
+            input41, input42 = st.columns(2)
+            benchmarks = []
+            with input41:
+                benchmark_input = st.text_input('benchmark input', placeholder="Please input Yahoo Finance Symbol")
 
-            if benchmark_input:
-                benchmarks = str_to_array(benchmark_input)
-        with input42:
-            if benchmarks:
-                st.multiselect('Final Benchmark', benchmarks, benchmarks)
+                if benchmark_input:
+                    benchmarks = str_to_array(benchmark_input)
+            with input42:
+                if benchmarks:
+                    st.multiselect('Final Benchmark', benchmarks, benchmarks)
 
-    with st.container():
-        input51, input52 = st.columns(2)
-        with input51:
-            transaction_fee = float(st.text_input("Transaction Fee(%)") or '0')
+        with st.container():
+            input51, input52 = st.columns(2)
+            with input51:
+                transaction_fee = float(st.text_input("Transaction Fee(%)") or '0')
 
-    with st.container():
-        models = ['CRP', 'CORN']
-        model_selected = st.multiselect("Model Selection:", models, models)
+        with st.container():
+            models = ['CRP', 'CORN']
+            model_selected = st.multiselect("Model Selection:", models, models)
 
-        if 'CORN' in model_selected:
-            st.write("CORN Parameter")
-            input61, input62 = st.columns(2)
-            with input61:
-                corn_param['window_size'] = int(st.text_input("Window Size") or '0')
-            with input62:
-                corn_param['corr_threshold'] = float(st.text_input("Correlation Threshold") or '0')
+            if 'CORN' in model_selected:
+                st.write("CORN Parameter")
+                input61, input62 = st.columns(2)
+                with input61:
+                    corn_param['window_size'] = int(st.text_input("Window Size") or '0')
+                with input62:
+                    corn_param['corr_threshold'] = float(st.text_input("Correlation Threshold") or '0')
 
-    with st.container():
-        on_run = st.button("Analyze Portfolio")
+        with st.container():
+            on_run = st.form_submit_button("Analyze Portfolio")
 
 with st.expander("Asset Viewer"):
     with st.container():
