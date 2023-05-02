@@ -138,8 +138,8 @@ with st.expander("Asset Viewer"):
     with st.container():
         # https://docs.streamlit.io/library/api-reference/widgets/st.experimental_data_editor?ref=blog.streamlit.io
         disabled = False
-        #if data_source == 'HSI':
-            #disabled = True
+        if data_source in ['HSI', '13-F']:
+            disabled = True
         edited_df = st.experimental_data_editor(df, use_container_width=True, disabled=disabled,num_rows="dynamic")
 
 # Initialize for results
