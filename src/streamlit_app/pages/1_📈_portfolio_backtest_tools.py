@@ -65,7 +65,7 @@ with st.expander("Portfolio Model Configurations"):
     input11, input12 = st.columns(2)
     with st.container():
         with input11:
-            data_source = st.selectbox("Data Source", ('13-F', 'HSI', 'Default ETF', 'Manual'))
+            data_source = st.selectbox("Data Source", ('HSI', '13-F', 'Default ETF', 'Manual'))
         with input12:
             df = pd.DataFrame([{'symbol': '700', 'location': 'hk', 'weight_percent': 100}])
             if data_source == 'HSI':
@@ -138,9 +138,9 @@ with st.expander("Asset Viewer"):
     with st.container():
         # https://docs.streamlit.io/library/api-reference/widgets/st.experimental_data_editor?ref=blog.streamlit.io
         disabled = False
-        if data_source == 'HSI':
-            disabled = True
-        edited_df = st.experimental_data_editor(df, use_container_width=True, disabled=disabled)
+        #if data_source == 'HSI':
+            #disabled = True
+        edited_df = st.experimental_data_editor(df, use_container_width=True, disabled=disabled,num_rows="dynamic")
 
 # Initialize for results
 
@@ -241,7 +241,7 @@ with st.expander("Algo Results"):
             st.dataframe(algo_result_summary_df.set_index("algo_name").transpose(), use_container_width=True)
 
         with st.container():
-            st.write("###Equity Curve")
+            st.write("### Equity Curve")
             equity_curve_df = pd.DataFrame(
                 {algo_result.algo_name: algo_result.equity_curve for algo_result in algo_results},
             )
