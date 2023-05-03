@@ -5,6 +5,7 @@ from src.data_provider.yahoo_finance_data_provider import YahooFinanceDataProvid
 from src.model.Instrument import HKEquityInstrument
 from src.algo.CRP import CRP
 from src.algo.CORN import CORN
+import plotly.express as px
 
 import pandas as pd
 
@@ -56,6 +57,15 @@ def algo_container():
     algo_result = get_algo_result(asset_price, weights, "CRP")
     algo_result.fee = 0.2 / 100
     print(algo_result.summary())
+
+    equity_curve_df = pd.DataFrame(
+        {algo_result.algo_name: algo_result.equity_curve},
+    )
+
+    fig = px.line(equity_curve_df)
+    fig.show()
+    # fig.update_layout(legend=dict(orientation="h"))
+    # px.line(fig, theme="streamlit", use_container_width=True)
     ########## Bear (07/06/2021 - 05/09/2021) #############################
     #{'annualized_return': -0.2686854593472205, 'annualized_volatility': 0.15518561089627508,
     #'sharpe_ratio': -1.7313812652824359, 'mdd': 0.11398309646926885, 'calmar_ratio': -2.3572395177004264,
@@ -85,6 +95,7 @@ def algo_container():
 
     # CORN (Time consuming)
     # Need to run between different parameter
+
     opt_weight_param = TCAdjustedReturnOptWeightParam(
         fee=0.2 / 100,
         lda=0.5
@@ -93,6 +104,7 @@ def algo_container():
     algo_result = get_algo_result(asset_price, corn_weights[-len(asset_price):], "CORN")
     algo_result.fee = 0.2 / 100
     print(algo_result.summary())
+
     ########## Bear (07/06/2021 - 05/09/2021) ############################# CORN
     #{'annualized_return': -0.21119781724166015, 'annualized_volatility': 0.15692287402854893,
     # 'sharpe_ratio': -1.3458701833566789, 'mdd': 0.10745529937197351, 'calmar_ratio': -1.96544813030175,
@@ -104,11 +116,12 @@ def algo_container():
 
 
 if __name__ == "__main__":
-    # Todo: Optimize different parameters
-    bull_asset_prices = pd.read_csv('../data/HSI Index/hsi_con_prices_20210607.csv')
-    bull_asset_prices.set_index('Date', inplace=True)
-    reqs = get_algo_runner_req_corn()
-    algo_runner_mp_corn(bull_asset_prices, reqs, 'data/HSI Index/Bear')
+    # # Todo: Optimize different parameters
+    # bull_asset_prices = pd.read_csv('../data/HSI Index/hsi_con_prices_20210607.csv')
+    # bull_asset_prices.set_index('Date', inplace=True)
+    # reqs = get_algo_runner_req_corn()
+    # algo_runner_mp_corn(bull_asset_prices, reqs, 'data/HSI Index/Bear')
+    algo_container()
 
 
     # Todo: Min Variance Portfolio
