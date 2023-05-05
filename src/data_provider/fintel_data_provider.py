@@ -29,6 +29,7 @@ class FintelDataProvider:
     def get_filing_summary(self, fund_name: str, save_to_csv: bool = False):
         url = f"{self.URL_PREFIX}/i13fs/{fund_name}"
         r = requests.get(url, headers=self.HEADER)
+        print(r.status_code, r.text)
         sp = bs4.BeautifulSoup(r.text, 'lxml')
         tb = sp.find_all('table')[1]
         df = pd.read_html(str(tb), encoding='utf-8')[0]
