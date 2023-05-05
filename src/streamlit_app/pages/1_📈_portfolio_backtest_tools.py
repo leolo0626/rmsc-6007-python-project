@@ -187,7 +187,7 @@ algo_result_summary_df = pd.DataFrame()
 
 
 # on_run = st.button("Analyze Portfolio")
-
+algo_results = []
 if st.button("Analyze Portfolio"):
     # Convert the dataframe to Instrument basemodel
     assets = edited_df.apply(lambda x: Instrument(symbol=x['symbol'], location=x['location']),
@@ -219,7 +219,7 @@ if st.button("Analyze Portfolio"):
     #     ||                            ||
     #     ################################
     # '''
-    algo_results = []
+
 
     orig_asset_price = asset_price
     orig_asset_price.index = [extract_date_str(idx) for idx in orig_asset_price.index]
@@ -290,33 +290,36 @@ with st.expander("Algo Results"):
             fig.update_layout(legend=dict(orientation="h"))
             st.plotly_chart(fig, theme="streamlit", use_container_width=True)
 
-        algo_names_option = [algo_result.algo_name for algo_result in algo_results]
+        # algo_names_option = [algo_result.algo_name for algo_result in algo_results]
         # Step 1: loop algo name in and select in selectbox
-        with st.form("my_form"):
-            algo_option = st.selectbox("Algo Result", (algo_names_option))
-            target_algo_result = \
-                [algo_result for algo_result in algo_results if algo_result.algo_name == algo_option][0]
-            st.form_submit_button(disabled=True)
+        # with st.form("my_form"):
+        #     algo_option = st.selectbox("Algo Result", (algo_names_option))
+        #     target_algo_result = \
+        #         [algo_result for algo_result in algo_results if algo_result.algo_name == algo_option][0]
+        #     st.form_submit_button(disabled=True)
 
-        # Step 2: return value
-        with st.container():
-            st.write("### Asset's performance curve")
-            fig = px.line(target_algo_result.asset_equity)
-            fig.update_layout(legend=dict(orientation="h"))
-            st.plotly_chart(fig, theme="streamlit", use_container_width=True)
+if algo_results:
+    for target_algo_result in algo_results:
+    # Step 2: return value
+        with st.expander(f"Algo result - {target_algo_result.algo_name}"):
+            with st.container():
+                st.write("### Asset's performance curve")
+                fig = px.line(target_algo_result.asset_equity)
+                fig.update_layout(legend=dict(orientation="h"))
+                st.plotly_chart(fig, theme="streamlit", use_container_width=True)
 
-        with st.container():
-            st.write("### Decompose asset weight curve")
-            fig = px.line(target_algo_result.equity_decomposed)
-            fig.update_layout(legend=dict(orientation="h"))
-            st.plotly_chart(fig, theme="streamlit", use_container_width=True)
+            with st.container():
+                st.write("### Decompose asset weight curve")
+                fig = px.line(target_algo_result.equity_decomposed)
+                fig.update_layout(legend=dict(orientation="h"))
+                st.plotly_chart(fig, theme="streamlit", use_container_width=True)
 
-        with st.container():
-            st.write("### Position chart")
-            fig = px.area(target_algo_result.B)
-            fig.update_layout(legend=dict(orientation="h"))
-            st.plotly_chart(fig, theme="streamlit", use_container_width=True)
+            with st.container():
+                st.write("### Position chart")
+                fig = px.area(target_algo_result.B)
+                fig.update_layout(legend=dict(orientation="h"))
+                st.plotly_chart(fig, theme="streamlit", use_container_width=True)
 
-        with st.container():
-            st.write("### Drawdown Curve")
-            st.area_chart(target_algo_result.drawdown_curve)
+            with st.container():
+                st.write("### Drawdown Curve")
+                st.area_chart(target_algo_result.drawdown_curve)
